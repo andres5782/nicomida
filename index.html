@@ -105,12 +105,22 @@
 <body>
 
 <header>
-  <div class="brand">
-    <div class="logo">
-      <!-- Ilustración libre (vector “little prince” style) -->
-      <div class="logo" style="font-size:30px;display:grid;place-items:center;">
-  <div>⭐️👦🪐</div>
-    <div>
+ <div class="logo" style="display:grid;place-items:center;background:#fff8;border-radius:999px;width:56px;height:56px;">
+  <!-- SVG inline: sin dependencias externas -->
+  <svg width="40" height="40" viewBox="0 0 80 80" aria-label="El Principito" role="img">
+    <!-- Estrellita -->
+    <polygon points="40,8 45,24 62,24 48,34 53,50 40,40 27,50 32,34 18,24 35,24"
+             fill="#f6c453"/>
+    <!-- Planeta -->
+    <circle cx="40" cy="58" r="16" fill="#8ecae6"/>
+    <ellipse cx="40" cy="60" rx="24" ry="8" fill="#79b6d6" opacity="0.55"/>
+    <!-- Personaje sencillo sobre el planeta -->
+    <circle cx="40" cy="40" r="5" fill="#1b1b1b"/>
+    <rect x="38" y="44" width="4" height="10" rx="2" fill="#1b1b1b"/>
+    <rect x="33" y="50" width="4" height="8" rx="2" fill="#1b1b1b"/>
+    <rect x="43" y="50" width="4" height="8" rx="2" fill="#1b1b1b"/>
+  </svg>
+</div>
       <h1>Nicomida <small>Planificador semanal de comidas para tu peque (14–15 meses)</small></h1>
     </div>
   </div>
