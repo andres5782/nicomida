@@ -1,0 +1,17 @@
+{
+  "name": "Nicomida",
+  "short_name": "Nicomida",
+  "start_url": "/nicomida/",
+  "scope": "/nicomida/",
+  "display": "standalone",
+  "background_color": "#f8f4e8",
+  "theme_color": "#8ecae6",
+  "icons": [
+    {
+      "src": "https://twemoji.maxcdn.com/v/latest/72x72/2b50.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
