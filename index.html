@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Nicomida · Planificador semanal</title>
+
+<!-- Tipografía agradable y ligera -->
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg:#f8f4e8;           /* arena suave tipo cuento */
+    --card:#ffffff;
+    --ink:#1b1b1b;
+    --muted:#6b6b6b;
+    --star:#f6c453;         /* amarillo estrella */
+    --planet:#8ecae6;       /* celeste */
+    --rose:#ffb5c2;         /* rosa */
+    --green:#63c29b;        /* verde ok */
+    --warn:#ffb703;         /* ámbar */
+    --err:#ef476f;          /* rojo sugerencia */
+    --border:#e8decc;
+  }
+  *{ box-sizing: border-box; }
+  html,body{ height:100%; }
+  body{
+    margin:0; font-family: 'Nunito', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    color:var(--ink);
+    background:
+      radial-gradient(ellipse at 8% 10%, #fff7 0 2px, transparent 3px),
+      radial-gradient(ellipse at 75% 15%, #fff7 0 2px, transparent 3px),
+      radial-gradient(ellipse at 40% 30%, #fff5 0 2px, transparent 3px),
+      linear-gradient(0deg, var(--bg), var(--bg));
+    background-attachment: fixed;
+  }
+  header{
+    position:sticky; top:0; z-index:3;
+    background:linear-gradient(90deg, var(--planet), var(--rose));
+    color:#0c0c0c; padding:14px 18px; border-bottom:1px solid var(--border);
+  }
+  .brand{ max-width:1024px; margin:0 auto; display:flex; gap:14px; align-items:center; }
+  .logo{
+    width:56px; height:56px; border-radius:999px; overflow:hidden; background:#fff8;
+    display:grid; place-items:center; border:1px solid #ffffff66;
+  }
+  .logo img{ width:52px; height:52px; object-fit:cover; filter: drop-shadow(0 1px 0 #fff6); }
+  h1{ margin:0; font-size:24px; line-height:1.2; }
+  h1 small{ display:block; font-weight:600; opacity:.9; font-size:14px; }
+
+  main{ max-width:1024px; margin:0 auto; padding:18px; }
+  section{ background:var(--card); border:1px solid var(--border); border-radius:16px; padding:14px; margin-bottom:14px; box-shadow:0 2px 6px #0000000e; }
+  h2{ margin:6px 0 10px; font-size:18px; display:flex; align-items:center; gap:8px; }
+  .row{ display:flex; gap:10px; flex-wrap:wrap; }
+  .col{ flex:1 1 260px; }
+  label{ display:block; font-size:13px; margin:6px 0 4px; color:var(--muted); }
+  select, input[type="date"], input[type="text"], textarea{ width:100%; padding:10px; border:1px solid var(--border); border-radius:12px; background:#fff; }
+  button{ padding:10px 14px; border:1px solid var(--border); border-radius:12px; background:#fff; cursor:pointer; }
+  button:hover{ background:#fff6; }
+  .btn-primary{ background:var(--planet); border-color:#00000010; }
+  .btn-accent{ background:var(--star); }
+  .btn-danger{ background:var(--err); color:white; border-color:#0000; }
+  .pill{ display:inline-flex; align-items:center; gap:6px; padding:2px 10px; border:1px solid var(--border); border-radius:999px; font-size:12px; background:#fff; }
+  .result{ padding:12px; border:1px dashed var(--border); border-radius:12px; background:#fffdf7; white-space:pre-wrap; }
+  .small{ font-size:12px; color:var(--muted); }
+  .grid{ display:grid; grid-template-columns: repeat(auto-fill,minmax(240px,1fr)); gap:10px; }
+  .card{ border:1px solid var(--border); border-radius:14px; padding:12px; background:#fff; }
+  .ok{ border-left:4px solid var(--green); }
+  .suggest{ border-left:4px solid var(--err); background:#fff5f7; }
+  .warn{ border-left:4px solid var(--warn); }
+  .err{ border-left:4px solid var(--err); }
+  .weekbar{ display:flex; gap:6px; }
+  .chip{ padding:6px 10px; border:1px solid var(--border); border-radius:999px; background:#fff; font-size:12px; }
+  .daycol{ border:1px dashed var(--border); border-radius:12px; padding:10px; background:#fff; }
+  .dayhdr{ display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
+  .score{ height:12px; background:#eee; border-radius:999px; overflow:hidden; position:relative; }
+  .bar{ height:100%; background: linear-gradient(90deg, var(--green), var(--star)); width:0%; }
+  .legend{ display:flex; gap:8px; flex-wrap:wrap; margin-top:6px; }
+  .legend .pill{ background:#fffdf7; }
+  .banner{ padding:8px 10px; border-radius:10px; background:#fff6; border:1px solid var(--border); }
+  .obs{ margin-top:10px; display:grid; grid-template-columns:1fr; gap:8px; }
+  .obs .item{ display:flex; gap:8px; align-items:flex-start; padding:8px; border:1px solid var(--border); border-radius:10px; background:#fff; }
+  .obs .item.good{ border-left:4px solid var(--green); }
+  .obs .item.warn{ border-left:4px solid var(--warn); }
+  .obs .emj{ font-size:18px; line-height:1; }
+  .obs .txt{ font-size:13px; color:var(--ink); }
+  details.test{ margin-top:10px; }
+  details.test summary{ cursor:pointer; }
+  footer{ text-align:center; color:var(--muted); padding:16px; font-size:12px; }
+  /* Login overlay */
+  #loginWrap{ max-width:420px; margin:40px auto; background:#fff; border:1px solid var(--border); border-radius:16px; padding:16px; box-shadow:0 6px 20px #00000014; }
+  #loginWrap h2{ margin:6px 0 12px; }
+  #loginWrap .hint{ font-size:12px; color:var(--muted); margin-top:8px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <div class="logo">
+      <!-- Ilustración libre (vector “little prince” style) -->
+      <div class="logo" style="font-size:30px;display:grid;place-items:center;">
+  <div>⭐️👦🪐</div>
+    <div>
+      <h1>Nicomida <small>Planificador semanal de comidas para tu peque (14–15 meses)</small></h1>
+    </div>
+  </div>
+</header>
+
+<!-- LOGIN -->
+<div id="loginWrap">
+  <h2>Inicia sesión</h2>
+  <div class="row">
+    <div class="col">
+      <label>Email</label>
+      <input type="email" id="loginEmail" placeholder="tu@email.com">
+    </div>
+    <div class="col">
+      <label>Contraseña</label>
+      <input type="password" id="loginPass" placeholder="••••••••">
+    </div>
+  </div>
+  <div class="row" style="margin-top:10px">
+    <button id="btnLogin" class="btn-primary">Entrar</button>
+    <button id="btnLogout" class="btn-danger" style="display:none">Cerrar sesión</button>
+  </div>
+  <div id="loginErr" class="small" style="color:var(--err);margin-top:6px"></div>
+  <div class="hint">Solo pide login la primera vez en cada móvil. Después queda recordado.</div>
+</div>
+
+<!-- APP -->
+<main id="app" style="display:none">
+  <section>
+    <div class="row">
+      <div class="col">
+        <label>Fecha base de la semana</label>
+        <input type="date" id="date"/>
+      </div>
+      <div class="col">
+        <label>Turno</label>
+        <select id="turno">
+          <option value="comida">Comida (mediodía)</option>
+          <option value="cena">Cena (noche)</option>
+        </select>
+      </div>
+      <div class="col" style="align-self:end; display:flex; gap:8px;">
+        <button class="btn-primary" id="btnSugerirDia">Sugerir para día/turno</button>
+        <button id="btnPlanSemana" class="btn-accent">🪐 Planificar semana entera</button>
+        <button id="btnResumenPrev">📜 Resumen semana anterior</button>
+      </div>
+    </div>
+    <div class="small banner" id="estadoSemana"></div>
+  </section>
+
+  <!-- SUGERENCIA ACTUAL (arriba) -->
+  <section>
+    <h2>⭐ Sugerencia actual</h2>
+    <div id="sugerencia" class="result"></div>
+    <div class="row" style="margin-top:8px">
+      <button id="btnConfirmar" class="btn-primary">✅ Confirmar que la comió</button>
+      <button id="btnOtra" class="">🔁 Dame otra opción</button>
+      <div style="flex:1"></div>
+      <input type="text" id="inputManual" placeholder="o escribe aquí lo que realmente comió…" />
+      <button id="btnRegistrarManual" class="">✏️ Registrar texto</button>
+    </div>
+  </section>
+
+  <section>
+    <h2>🌙 Semana actual <span id="weekLabel" class="small"></span></h2>
+    <div id="weekGrid" class="grid"></div>
+  </section>
+
+  <section>
+    <h2>📈 Progreso semanal</h2>
+    <div class="card">
+      <div class="score"><div id="scoreBar" class="bar"></div></div>
+      <div id="scoreMsg" class="small" style="margin-top:6px"></div>
+      <div class="legend">
+        <span class="pill">🐟 Pescado objetivo: 2/sem</span>
+        <span class="pill">🥚 Huevo objetivo: 1–3/sem</span>
+        <span class="pill">🌱 Legumbre objetivo: 2/sem</span>
+        <span class="pill">🥩 Carne roja máx: 1/sem</span>
+        <span class="pill">🍗 Carne blanca: 2–4/sem</span>
+      </div>
+      <div id="observaciones" class="obs"></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>📜 Resumen semana anterior & Lista de la compra</h2>
+    <div id="resumenPrev" class="grid"></div>
+    <div id="listaCompra" class="card" style="display:none"></div>
+  </section>
+
+  <details class="test">
+    <summary>🧪 Diagnóstico (tests internos)</summary>
+    <pre id="testLog" class="small"></pre>
+  </details>
+</main>
+
+<footer>
+  Nicomida — hecho con ✨ para familias ocupadas. Ajusta con tu criterio y el del pediatra.
+</footer>
+
+<!-- Firebase (ES6 modules desde CDN oficial) -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+  import { getFirestore, doc, setDoc, getDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+  // === TU CONFIG DE FIREBASE (ya aportada) ===
+  const firebaseConfig = {
+    apiKey: "AIzaSyBnKtr2wEFTlgc9GRmbzKvn1DhkBpnEZy4",
+    authDomain: "nicomida.firebaseapp.com",
+    projectId: "nicomida",
+    storageBucket: "nicomida.firebasestorage.app",
+    messagingSenderId: "466859827970",
+    appId: "1:466859827970:web:28619d830178a1b913d81b"
+  };
+
+  // Inicializar Firebase
+  const appFB = initializeApp(firebaseConfig);
+  const auth = getAuth(appFB);
+  const db = getFirestore(appFB);
+  await setPersistence(auth, browserLocalPersistence); // recuerda sesión
+
+  // ====== LOGIN UI ======
+  const loginWrap = document.getElementById('loginWrap');
+  const app = document.getElementById('app');
+  const btnLogin = document.getElementById('btnLogin');
+  const btnLogout = document.getElementById('btnLogout');
+  const loginErr = document.getElementById('loginErr');
+
+  btnLogin.addEventListener('click', async ()=>{
+    const email = (document.getElementById('loginEmail').value||'').trim();
+    const pass  = (document.getElementById('loginPass').value||'').trim();
+    loginErr.textContent='';
+    try{
+      await signInWithEmailAndPassword(auth, email, pass);
+    }catch(e){
+      loginErr.textContent = 'Error: ' + e.message;
+    }
+  });
+  btnLogout.addEventListener('click', async ()=>{ await signOut(auth); });
+
+  onAuthStateChanged(auth, (user)=>{
+    if(user){
+      loginWrap.style.display='none';
+      btnLogout.style.display='inline-flex';
+      app.style.display='block';
+      onLoginReady();
+    }else{
+      loginWrap.style.display='block';
+      btnLogout.style.display='none';
+      app.style.display='none';
+    }
+  });
+
+  // ====== NICOMIDA (misma lógica que trabajamos, ahora con Firestore) ======
+
+  // Utilidades de fecha
+  const fmtISO = d=> d.toISOString().slice(0,10);
+  function startOfWeek(date){ const d=new Date(date); const day=(d.getDay()+6)%7; d.setDate(d.getDate()-day); d.setHours(0,0,0,0); return d; }
+  function addDays(date,n){ const d=new Date(date); d.setDate(d.getDate()+n); return d; }
+  function weekLabel(d){ const a=startOfWeek(d); const b=addDays(a,6); return `${fmtISO(a)} → ${fmtISO(b)}`; }
+
+  // Datos base
+  const DATA={
+    evitar:["tomate","miel"],
+    proteinas:[
+      {name:"pollo", tipo:"carne_blanca", rBase:35},
+      {name:"pavo", tipo:"carne_blanca", rBase:35},
+      {name:"ternera", tipo:"carne_roja", rBase:35},
+      {name:"cerdo magro", tipo:"carne_roja", rBase:35},
+      {name:"merluza", tipo:"pescado_blanco", rBase:30},
+      {name:"lenguado", tipo:"pescado_blanco", rBase:30},
+      {name:"bacalao fresco", tipo:"pescado_blanco", rBase:30},
+      {name:"salmón", tipo:"pescado_azul", rBase:30},
+      {name:"huevo", tipo:"huevo", rBase:50},
+      {name:"lentejas", tipo:"legumbre", rBase:40, factor:0.5},
+      {name:"garbanzos", tipo:"legumbre", rBase:40, factor:0.5},
+      {name:"alubias", tipo:"legumbre", rBase:40, factor:0.5}
+    ],
+    verduras:["calabacín","calabaza","zanahoria","batata","patata","judías verdes","brócoli","coliflor","guisantes","aguacate","pepino","pimiento rojo asado","remolacha cocida"],
+    carbs:[{name:"pasta",r:50},{name:"arroz",r:50},{name:"patata",r:110},{name:"batata",r:110},{name:"pan integral",r:30},{name:"quinoa",r:50},{name:"cuscús",r:50},{name:"sémola",r:50}],
+    frutas:["plátano","pera","manzana","arándanos","mandarina","melón","sandía","melocotón"]
+  };
+
+  // Persistencia en Firestore por semana (compartida entre usuarios autenticados)
+  function weekDocRef(mondayISO){ return doc(db, "familia", "shared", "weeks", mondayISO); }
+
+  // Entrada: { proteina:{name,tipo,r}, verduras:[..], carb:{name,r}, fruta, nota? }
+  function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+  function suggestFor(dayISO, turno, weekData){
+    const freq={};
+    for(const d in weekData.entries||{}){ for(const t of ["comida","cena"]){
+      const e=weekData.entries[d]?.[t]; if(e?.proteina){ const tp=e.proteina.tipo; freq[tp]=(freq[tp]||0)+1; }
+    } }
+    const otherTurn= turno==="comida"?"cena":"comida";
+    const sameDay=weekData.entries?.[dayISO]?.[otherTurn];
+    const avoidTipo = sameDay?.proteina?.tipo || null;
+    const redCount = (freq["carne_roja"]||0);
+
+    let cands = DATA.proteinas.slice();
+    if(avoidTipo) cands=cands.filter(p=>p.tipo!==avoidTipo);
+
+    function score(p){
+      let s=10; const t=freq[p.tipo]||0;
+      if(p.tipo.startsWith("pescado")) s+= (t>=2? -6 : (2-t)*2);
+      if(p.tipo==="legumbre") s+= (t>=2? -4 : (2-t)*2);
+      if(p.tipo==="huevo") s+= (t>=3? -4 : (1<=t&&t<3? 1 : 2));
+      if(p.tipo==="carne_roja") s+= (redCount>=1? -8 : 0);
+      if(p.tipo==="carne_blanca") s+= (t>=4? -4 : 1);
+      return s + (Math.random()*2);
+    }
+    cands.sort((a,b)=>score(b)-score(a));
+    const prot = {...cands[0]};
+    prot.r = (turno==="comida" ? (prot.tipo==="legumbre"?40: prot.tipo==="huevo"?50:35)
+                               : (prot.tipo==="legumbre"?40: prot.tipo==="huevo"?50:25));
+    const v1 = pick(DATA.verduras);
+    let v2 = pick(DATA.verduras.filter(v=>v!==v1)); if(Math.random()<0.4) v2=null; const vSel = v2?[v1,v2]:[v1];
+    let carb = pick(DATA.carbs);
+    const vn=vSel.map(n=>n.toLowerCase());
+    if(vn.includes("patata") && carb.name==="patata") carb = pick(DATA.carbs.filter(c=>c.name!=="patata"));
+    if(vn.includes("batata") && carb.name==="batata") carb = pick(DATA.carbs.filter(c=>c.name!=="batata"));
+    const fruta = pick(DATA.frutas);
+    return { proteina:prot, verduras:vSel, carb, fruta };
+  }
+
+  function weeklyProgress(entries){
+    const cnt={ pescado:0, huevo:0, legumbre:0, roja:0, blanca:0 };
+    for(const d in entries||{}){ for(const t of ["comida","cena"]){
+      const e=entries[d]?.[t]; if(!e?.proteina) continue; const tp=e.proteina.tipo;
+      if(tp.startsWith("pescado")) cnt.pescado++; else if(tp==="huevo") cnt.huevo++; else if(tp==="legumbre") cnt.legumbre++; else if(tp==="carne_roja") cnt.roja++; else if(tp==="carne_blanca") cnt.blanca++;
+    } }
+    const goals={ pescado:2, huevo:[1,3], legumbre:2, rojaMax:1, blanca:[2,4] };
+    let score=0, total=5;
+    if(cnt.pescado>=goals.pescado) score++;
+    if(cnt.huevo>=goals.huevo[0] && cnt.huevo<=goals.huevo[1]) score++;
+    if(cnt.legumbre>=goals.legumbre) score++;
+    if(cnt.roja<=goals.rojaMax) score++;
+    if(cnt.blanca>=goals.blanca[0] && cnt.blanca<=goals.blanca[1]) score++;
+    const pct=Math.round((score/total)*100);
+
+    const msgs=[];
+    if(cnt.pescado<2) msgs.push(`🐟 Falta pescado esta semana (${cnt.pescado}/2).`);
+    if(cnt.legumbre<2) msgs.push(`🌱 Pocas legumbres (${cnt.legumbre}/2).`);
+    if(cnt.huevo<1) msgs.push(`🥚 Añade 1 huevo en la semana.`);
+    if(cnt.roja>1) msgs.push(`🥩 Demasiada carne roja (${cnt.roja}/≤1).`);
+    if(cnt.blanca<2) msgs.push(`🍗 Sube carne blanca (actual ${cnt.blanca}).`);
+    return {cnt, pct, msgs};
+  }
+
+  function nutritionObservations(entries){
+    const days = Object.keys(entries||{}).sort();
+    const items=[]; const E=[];
+    for(const d of days){ for(const t of ["comida","cena"]){ const e=entries[d]?.[t]; if(!e) continue; E.push({d,t,e}); if(e.verduras) items.push(...e.verduras); if(e.carb) items.push(e.carb.name); } }
+    const good=[]; const warn=[];
+    const fruitCounts={}; let potatoLike=0; let veggieSet=new Set(); let fish=0, legumes=0;
+    for(const {e} of E){
+      if(e.carb?.name && ["patata","batata"].includes(e.carb.name)) potatoLike++;
+      if(e.fruta){ fruitCounts[e.fruta]=(fruitCounts[e.fruta]||0)+1; }
+      if(Array.isArray(e.verduras)) e.verduras.forEach(v=>veggieSet.add(v));
+      const tp=e.proteina?.tipo; if(tp){ if(tp.startsWith('pescado')) fish++; if(tp==='legumbre') legumes++; }
+    }
+    if(potatoLike>=3) warn.push({emj:'🥔', txt:'Mucha patata/boniato esta semana. Alterna con arroz, pasta, quinoa o pan para variar.'});
+    const last3 = E.slice(-3); if(last3.length===3){
+      const starchyNames = last3.map(x=>x.e.carb?.name||'');
+      const uniq = new Set(starchyNames.filter(Boolean));
+      const allStarchy = starchyNames.filter(n=>['patata','batata','arroz','pasta','pan integral','cuscús','sémola','quinoa'].includes(n)).length===3;
+      if(allStarchy && uniq.size<=2){ warn.push({emj:'⚖️', txt:'Mucho carbo repetido en las últimas comidas. Rota para un perfil más estable.'}); }
+    }
+    const blue = fruitCounts['arándanos']||0;
+    if(blue>=4) warn.push({emj:'🫐', txt:'Muchos arándanos esta semana. Rota con plátano/pera/manzana para variedad.'});
+    else if(blue>=1) good.push({emj:'🫐', txt:'Bien con los arándanos: antioxidantes y color. 👏'});
+    if(fish>=2) good.push({emj:'🐟', txt:'Buen aporte de pescado (omega-3, yodo).'});
+    else if(fish===0 && E.length>=4) warn.push({emj:'🐟', txt:'Aún sin pescado esta semana. Intenta incluir 1–2 raciones.'});
+    if(legumes>=2) good.push({emj:'🌱', txt:'Bien por incluir legumbres: fibra y proteína vegetal.'});
+    if(veggieSet.size>=5) good.push({emj:'🥦', txt:'Buena variedad de verduras (≥5 tipos).'});
+    return {good, warn};
+  }
+
+  // ======= UI refs =======
+  const dateEl=document.getElementById('date');
+  const turnoEl=document.getElementById('turno');
+  const weekGrid=document.getElementById('weekGrid');
+  const weekLabelEl=document.getElementById('weekLabel');
+  const estadoSemana=document.getElementById('estadoSemana');
+  const sugerenciaEl=document.getElementById('sugerencia');
+  const btnSugerirDia=document.getElementById('btnSugerirDia');
+  const btnPlanSemana=document.getElementById('btnPlanSemana');
+  const btnResumenPrev=document.getElementById('btnResumenPrev');
+  const btnConfirmar=document.getElementById('btnConfirmar');
+  const btnOtra=document.getElementById('btnOtra');
+  const inputManual=document.getElementById('inputManual');
+  const btnRegistrarManual=document.getElementById('btnRegistrarManual');
+  const scoreBar=document.getElementById('scoreBar');
+  const scoreMsg=document.getElementById('scoreMsg');
+  const resumenPrev=document.getElementById('resumenPrev');
+  const listaCompra=document.getElementById('listaCompra');
+  const testLog=document.getElementById('testLog');
+
+  // Estado actual en memoria
+  let currentMondayISO=null; let currentDayISO=null; let currentTurno='comida'; let cacheSug=null;
+  let unsubscribeWeek = null; // listener Firestore
+  let state = { weekStart:null, entries:{}, suggestions:{}, updatedAt:null }; // lo que viene de Firestore
+
+  function renderWeek(){
+    const base = startOfWeek(new Date(dateEl.value||new Date()));
+    const mondayISO = fmtISO(base);
+    currentMondayISO = mondayISO;
+    weekLabelEl.textContent = `(${weekLabel(base)})`;
+
+    const data = state.weekStart===mondayISO ? state : { weekStart:mondayISO, entries:{}, suggestions:{} };
+
+    const prog = weeklyProgress(data.entries);
+    scoreBar.style.width = prog.pct + '%';
+    scoreMsg.textContent = prog.msgs.length? prog.msgs.join(' ') : '✅ Buen equilibrio esta semana.';
+    const obs = nutritionObservations(data.entries);
+    const obsEl=document.getElementById('observaciones');
+    obsEl.innerHTML = [
+      ...obs.warn.map(o=>`<div class="item warn"><div class="emj">${o.emj}</div><div class="txt">${o.txt}</div></div>`),
+      ...obs.good.map(o=>`<div class="item good"><div class="emj">${o.emj}</div><div class="txt">${o.txt}</div></div>`)
+    ].join('') || '<div class="small">Sin observaciones por ahora. 👍</div>';
+
+    estadoSemana.textContent = `Semana ${weekLabel(base)} — proteína total diaria orientativa 40–60 g (comida/cena).`;
+
+    const cols=[];
+    for(let i=0;i<7;i++){
+      const d=fmtISO(addDays(base,i));
+      const pretty = new Date(d).toLocaleDateString('es-ES',{weekday:'short', day:'2-digit', month:'2-digit'});
+      const eC=data.entries?.[d]?.comida; const eN=data.entries?.[d]?.cena;
+      const sC=data.suggestions?.[d]?.comida; const sN=data.suggestions?.[d]?.cena;
+
+      cols.push(`<div class="daycol" data-day="${d}">
+        <div class="dayhdr"><b>${pretty}</b>
+          <div class="weekbar">
+            <span class="chip">${eC? '🍽️' : (sC?'📝':'—')} Comida</span>
+            <span class="chip">${eN? '🌙' : (sN?'📝':'—')} Cena</span>
+          </div>
+        </div>
+        ${renderEntry('Comida', eC, sC, d, 'comida')}
+        ${renderEntry('Cena',   eN, sN, d, 'cena')}
+        <div class="row" style="margin-top:8px">
+          <button data-act="sugC" data-day="${d}">Sugerir comida</button>
+          <button data-act="sugN" data-day="${d}">Sugerir cena</button>
+        </div>
+      </div>`);
+    }
+    weekGrid.innerHTML = cols.join('');
+
+    weekGrid.addEventListener('click', weekGrid._handler || (weekGrid._handler=(ev)=>{
+      const btn = ev.target.closest('button'); if(!btn) return;
+      const day = btn.getAttribute('data-day'); const act = btn.getAttribute('data-act');
+      if(act==='sugC' || act==='sugN'){
+        currentDayISO=day; currentTurno = (act==='sugC')?'comida':'cena';
+        const sug = suggestFor(day, currentTurno, state);
+        cacheSug=sug;
+        // Guardar sugerencia (roja) en Firestore
+        const newSug = structuredClone(state.suggestions||{});
+        newSug[day]=newSug[day]||{}; newSug[day][currentTurno]=sug;
+        saveWeek({ ...state, weekStart:mondayISO, suggestions:newSug });
+        sugerenciaEl.textContent = formatSug(day, currentTurno, sug);
+      }
+      if(act==='confirmHere'){
+        const turno = btn.getAttribute('data-turno');
+        const sug = state.suggestions?.[day]?.[turno]; if(!sug) return;
+        const newEntries = structuredClone(state.entries||{});
+        newEntries[day]=newEntries[day]||{}; newEntries[day][turno]=sug;
+        const newSug = structuredClone(state.suggestions||{});
+        delete newSug[day]?.[turno]; if(newSug[day] && !Object.keys(newSug[day]).length) delete newSug[day];
+        saveWeek({ ...state, weekStart:mondayISO, entries:newEntries, suggestions:newSug });
+      }
+      if(act==='discardSug'){
+        const turno = btn.getAttribute('data-turno');
+        const newSug = structuredClone(state.suggestions||{});
+        delete newSug[day]?.[turno]; if(newSug[day] && !Object.keys(newSug[day]).length) delete newSug[day];
+        saveWeek({ ...state, weekStart:mondayISO, suggestions:newSug });
+      }
+    }));
+  }
+
+  function renderEntry(label, e, sug, dayISO, turno){
+    if(!e && sug){
+      const pEq = sug.proteina?.factor? ` (≈${Math.round((sug.proteina.r||sug.proteina.rBase)*sug.proteina.factor)} g eq.)` : '';
+      return `<div class="card suggest small"><b>${label} · sugerencia</b><br>
+        Prot.: ${sug.proteina?.name||'-'} — ${(sug.proteina?.r||sug.proteina?.rBase||0)} g${pEq}<br>
+        Verd.: ${(sug.verduras||[]).join(' + ')||'-'}<br>
+        Carb.: ${sug.carb?.name||'-'} — ${(sug.carb?.r||0)} g<br>
+        Fruta: ${sug.fruta||'-'}
+        <div class="row" style="margin-top:6px">
+          <button data-act="confirmHere" data-day="${dayISO}" data-turno="${turno}" class="btn-primary">Confirmar aquí</button>
+          <button data-act="discardSug" data-day="${dayISO}" data-turno="${turno}" class="btn-danger">Descartar</button>
+        </div>
+      </div>`;
+    }
+    if(!e) return `<div class="card warn small">${label}: sin registro</div>`;
+    if(e.nota){
+      return `<div class="card ok small"><b>${label}</b><br>${e.nota}</div>`;
+    }
+    const pEq = e.proteina?.factor? ` (≈${Math.round((e.proteina.r||e.proteina.rBase)*e.proteina.factor)} g eq.)` : '';
+    return `<div class="card ok small"><b>${label}</b><br>
+      Prot.: ${e.proteina?.name||'-'} — ${(e.proteina?.r||e.proteina?.rBase||0)} g${pEq}<br>
+      Verd.: ${(e.verduras||[]).join(' + ')||'-'}<br>
+      Carb.: ${e.carb?.name||'-'} — ${(e.carb?.r||0)} g<br>
+      Fruta: ${e.fruta||'-'}
+    </div>`;
+  }
+
+  function formatSug(dayISO, turno, sug){
+    const nice = new Date(dayISO).toLocaleDateString('es-ES',{weekday:'long', day:'2-digit', month:'2-digit'});
+    const lines=[];
+    lines.push(`🗓️ ${nice} · ${turno==='comida'?'Comida':'Cena'}`);
+    lines.push(`• Proteína: ${sug.proteina.name} — ${sug.proteina.r} g` + (sug.proteina.factor? ` (≈${Math.round(sug.proteina.r*sug.proteina.factor)} g eq.)`:'' ));
+    lines.push(`• Verduras: ${sug.verduras.join(' + ')}`);
+    lines.push(`• Carbohidrato: ${sug.carb.name} — ${sug.carb.r} g`);
+    lines.push(`• Fruta (opcional): ${sug.fruta}`);
+    return lines.join('\n');
+  }
+
+  // Guardar semana en Firestore (merge)
+  async function saveWeek(newState){
+    const ref = weekDocRef(newState.weekStart);
+    const payload = { ...newState, updatedAt: serverTimestamp() };
+    await setDoc(ref, payload, { merge:true });
+  }
+
+  // Resumen semana anterior + lista de compra (derivado en cliente)
+  function summarizeWeek(entries){
+    const days = Object.keys(entries||{}).sort();
+    const items=[]; const cards=[];
+    for(const d of days){
+      for(const t of ["comida","cena"]){
+        const e=entries[d]?.[t]; if(!e) continue;
+        cards.push({d,t,e});
+        if(e.proteina?.name) items.push(e.proteina.name);
+        if(e.verduras) items.push(...e.verduras);
+        if(e.carb?.name) items.push(e.carb.name);
+      }
+    }
+    const tally={}; for(const it of items){ if(!it) continue; tally[it]=(tally[it]||0)+1; }
+    const list = Object.entries(tally).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`• ${k} ×${v}`);
+    return {cards, list};
+  }
+
+  // Handlers botones globales
+  btnSugerirDia.addEventListener('click', ()=>{
+    const base=startOfWeek(new Date(dateEl.value||new Date()));
+    const mondayISO=fmtISO(base);
+    const today=fmtISO(new Date());
+    const weekMon=fmtISO(base), weekSun=fmtISO(addDays(base,6));
+    const pickDay = (today>=weekMon && today<=weekSun) ? today : weekMon;
+    currentDayISO=pickDay; currentTurno=(turnoEl.value||'comida');
+    const sug=suggestFor(currentDayISO,currentTurno,state);
+    const newSug = structuredClone(state.suggestions||{});
+    newSug[currentDayISO]=newSug[currentDayISO]||{}; newSug[currentDayISO][currentTurno]=sug;
+    cacheSug=sug; sugerenciaEl.textContent = formatSug(currentDayISO,currentTurno,sug);
+    saveWeek({ ...state, weekStart:mondayISO, suggestions:newSug });
+  });
+
+  btnOtra.addEventListener('click', ()=>{
+    if(!currentDayISO){ sugerenciaEl.textContent='Elige una semana y pulsa "Sugerir" primero.'; return; }
+    const sug=suggestFor(currentDayISO,currentTurno,state);
+    const newSug = structuredClone(state.suggestions||{});
+    newSug[currentDayISO]=newSug[currentDayISO]||{}; newSug[currentDayISO][currentTurno]=sug;
+    cacheSug=sug; sugerenciaEl.textContent = formatSug(currentDayISO,currentTurno,sug);
+    saveWeek({ ...state, suggestions:newSug });
+  });
+
+  btnConfirmar.addEventListener('click', ()=>{
+    if(!cacheSug || !currentDayISO){ sugerenciaEl.textContent='No hay sugerencia que confirmar.'; return; }
+    const newEntries = structuredClone(state.entries||{});
+    newEntries[currentDayISO]=newEntries[currentDayISO]||{}; newEntries[currentDayISO][currentTurno]=cacheSug;
+    const newSug = structuredClone(state.suggestions||{});
+    delete newSug[currentDayISO]?.[currentTurno]; if(newSug[currentDayISO] && !Object.keys(newSug[currentDayISO]).length) delete newSug[currentDayISO];
+    saveWeek({ ...state, entries:newEntries, suggestions:newSug });
+    sugerenciaEl.textContent='✅ Guardado en la semana. Puedes seguir planificando.';
+  });
+
+  btnRegistrarManual.addEventListener('click', ()=>{
+    const txt = (inputManual.value||'').trim();
+    if(!txt || !currentDayISO){ sugerenciaEl.textContent='Escribe el texto y elige día/turno.'; return; }
+    const newEntries = structuredClone(state.entries||{});
+    newEntries[currentDayISO]=newEntries[currentDayISO]||{}; newEntries[currentDayISO][currentTurno] = { nota: txt };
+    const newSug = structuredClone(state.suggestions||{});
+    delete newSug[currentDayISO]?.[currentTurno]; if(newSug[currentDayISO] && !Object.keys(newSug[currentDayISO]).length) delete newSug[currentDayISO];
+    inputManual.value='';
+    saveWeek({ ...state, entries:newEntries, suggestions:newSug });
+    sugerenciaEl.textContent='✏️ Registrado lo que realmente comió.';
+  });
+
+  btnPlanSemana.addEventListener('click', ()=>{
+    const base = startOfWeek(new Date(dateEl.value||new Date()));
+    const mondayISO=fmtISO(base);
+    const data = structuredClone(state);
+    for(let i=0;i<7;i++){
+      const dISO=fmtISO(addDays(base,i));
+      for(const t of ['comida','cena']){
+        const sug=suggestFor(dISO, t, data);
+        data.suggestions=data.suggestions||{}; data.suggestions[dISO]=data.suggestions[dISO]||{}; data.suggestions[dISO][t]=sug;
+      }
+    }
+    saveWeek({ ...state, weekStart:mondayISO, suggestions:data.suggestions });
+    sugerenciaEl.textContent='🪐 Borrador semanal creado como sugerencias (rojo). Confirma día a día.';
+  });
+
+  btnResumenPrev.addEventListener('click', async ()=>{
+    const base = startOfWeek(new Date(dateEl.value||new Date()));
+    const prevMon = fmtISO(addDays(base,-7));
+    const snap = await getDoc(weekDocRef(prevMon));
+    const prev = snap.exists()? snap.data() : {entries:{}};
+    const {cards,list} = summarizeWeek(prev.entries||{});
+    if(cards.length===0){ resumenPrev.innerHTML = '<div class="card warn">No hay registros de la semana anterior.</div>'; listaCompra.style.display='none'; return; }
+    resumenPrev.innerHTML = cards.map(({d,t,e})=>{
+      const pretty = new Date(d).toLocaleDateString('es-ES',{weekday:'short', day:'2-digit', month:'2-digit'});
+      const text = e.nota? e.nota : `${e.proteina?.name||'-'} + ${(e.verduras||[]).join(' + ')||'-'} + ${e.carb?.name||'-'}`;
+      return `<div class="card small"><b>${pretty} · ${t==='comida'?'Comida':'Cena'}</b><br>${text}</div>`;
+    }).join('');
+    listaCompra.style.display='block';
+    listaCompra.innerHTML = `<b>🛒 Lista de la compra sugerida</b><br>${list.join('<br>')}`;
+  });
+
+  // Arranque cuando el usuario ya está autenticado
+  async function onLoginReady(){
+    const today=new Date();
+    dateEl.value = fmtISO(today);
+
+    // Suscripción en tiempo real a la semana visible
+    await switchWeek(fmtISO(startOfWeek(new Date(dateEl.value))));
+    dateEl.addEventListener('change', async ()=>{
+      await switchWeek(fmtISO(startOfWeek(new Date(dateEl.value))));
+    });
+
+    runSelfTests();
+  }
+
+  async function switchWeek(mondayISO){
+    if(unsubscribeWeek){ unsubscribeWeek(); unsubscribeWeek=null; }
+    const ref = weekDocRef(mondayISO);
+    // Si no existe, inicializa vacío (para evitar primer onSnapshot nulo)
+    const snap=await getDoc(ref);
+    if(!snap.exists()){
+      await setDoc(ref, { weekStart:mondayISO, entries:{}, suggestions:{}, updatedAt: serverTimestamp() }, { merge:true });
+    }
+    unsubscribeWeek = onSnapshot(ref, (docSnap)=>{
+      if(docSnap.exists()){
+        state = docSnap.data() || {weekStart:mondayISO, entries:{}, suggestions:{}};
+        renderWeek();
+      }
+    });
+  }
+
+  // Tests simples
+  function runSelfTests(){
+    const log=[]; const ok=(m)=>log.push('✅ '+m); const fail=(m)=>log.push('❌ '+m);
+    try{ const mon = startOfWeek(new Date('2025-08-14')); if(mon.getDay()===1) ok('startOfWeek fija lunes correctamente'); else fail('startOfWeek no cae en lunes'); }catch(e){ fail('startOfWeek error: '+e.message); }
+    try{ const sug = suggestFor(fmtISO(startOfWeek(new Date())),'comida',{entries:{}}); if(sug && sug.proteina && sug.carb && Array.isArray(sug.verduras)) ok('suggestFor válido'); else fail('suggestFor inválido'); }catch(e){ fail('suggestFor error: '+e.message); }
+    testLog.textContent = log.join('\n');
+  }
+
+</script>
+</body>
+</html>
