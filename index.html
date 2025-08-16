@@ -1,683 +1,495 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <!-- Icono para iPhone/iPad -->
-<link rel="apple-touch-icon" href="https://twemoji.maxcdn.com/v/latest/72x72/2b50.png">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-
-<!-- Manifest para Android/Chrome (e iOS/Chrome) -->
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#8ecae6">
-
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Nicomida · Planificador semanal</title>
-
-<!-- Tipografía agradable y ligera -->
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800&display=swap" rel="stylesheet">
-
+<title>Nicomida – Modo Simple (v4.3.1 Pastel + Firebase Auth, PWA)</title>
+<link rel="manifest" id="app-manifest">
+<meta name="theme-color" content="#A8E6CF" />
 <style>
   :root{
-    --bg:#f8f4e8;           /* arena suave tipo cuento */
-    --card:#ffffff;
-    --ink:#1b1b1b;
-    --muted:#6b6b6b;
-    --star:#f6c453;         /* amarillo estrella */
-    --planet:#8ecae6;       /* celeste */
-    --rose:#ffb5c2;         /* rosa */
-    --green:#63c29b;        /* verde ok */
-    --warn:#ffb703;         /* ámbar */
-    --err:#ef476f;          /* rojo sugerencia */
-    --border:#e8decc;
+    /* Paleta pastel juvenil */
+    --bg:#fafafa;            /* fondo base */
+    --ink:#0f172a;           /* texto principal */
+    --muted:#6b7280;         /* texto secundario */
+    --border:#e5e7eb;        /* líneas suaves */
+    --brand:#A8E6CF;         /* menta pastel */
+    --brand-2:#FF8B94;       /* coral suave */
+    --accent-1:#FFD3B6;      /* vainilla */
+    --accent-2:#E0BBE4;      /* lavanda */
+    --danger:#ef4444;        /* rojo */
+    --warn:#f59e0b;          /* amarillo */
+    --ok:#10b981;            /* verde ok */
+    --card:#ffffff;          /* tarjeta */
+    --card-ghost:rgba(255,255,255,.85);
+    --shadow:0 12px 34px rgba(2,6,23,.06), 0 3px 12px rgba(2,6,23,.04);
+    --radius:20px;
   }
-  *{ box-sizing: border-box; }
-  html,body{ height:100%; }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial}
   body{
-    margin:0; font-family: 'Nunito', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
     color:var(--ink);
     background:
-      radial-gradient(ellipse at 8% 10%, #fff7 0 2px, transparent 3px),
-      radial-gradient(ellipse at 75% 15%, #fff7 0 2px, transparent 3px),
-      radial-gradient(ellipse at 40% 30%, #fff5 0 2px, transparent 3px),
-      linear-gradient(0deg, var(--bg), var(--bg));
-    background-attachment: fixed;
+      radial-gradient(900px 600px at 10% -10%, rgba(168,230,207,.55) 0, transparent 45%),
+      radial-gradient(900px 600px at 110% -10%, rgba(224,187,228,.45) 0, transparent 45%),
+      linear-gradient(180deg, #fff, #fafafa 60%);
   }
-  header{
-    position:sticky; top:0; z-index:3;
-    background:linear-gradient(90deg, var(--planet), var(--rose));
-    color:#0c0c0c; padding:14px 18px; border-bottom:1px solid var(--border);
-  }
-  .brand{ max-width:1024px; margin:0 auto; display:flex; gap:14px; align-items:center; }
-  .logo{
-    width:56px; height:56px; border-radius:999px; overflow:hidden; background:#fff8;
-    display:grid; place-items:center; border:1px solid #ffffff66;
-  }
-  .logo img{ width:52px; height:52px; object-fit:cover; filter: drop-shadow(0 1px 0 #fff6); }
-  h1{ margin:0; font-size:24px; line-height:1.2; }
-  h1 small{ display:block; font-weight:600; opacity:.9; font-size:14px; }
 
-  main{ max-width:1024px; margin:0 auto; padding:18px; }
-  section{ background:var(--card); border:1px solid var(--border); border-radius:16px; padding:14px; margin-bottom:14px; box-shadow:0 2px 6px #0000000e; }
-  h2{ margin:6px 0 10px; font-size:18px; display:flex; align-items:center; gap:8px; }
-  .row{ display:flex; gap:10px; flex-wrap:wrap; }
-  .col{ flex:1 1 260px; }
-  label{ display:block; font-size:13px; margin:6px 0 4px; color:var(--muted); }
-  select, input[type="date"], input[type="text"], textarea{ width:100%; padding:10px; border:1px solid var(--border); border-radius:12px; background:#fff; }
-  button{ padding:10px 14px; border:1px solid var(--border); border-radius:12px; background:#fff; cursor:pointer; }
-  button:hover{ background:#fff6; }
-  .btn-primary{ background:var(--planet); border-color:#00000010; }
-  .btn-accent{ background:var(--star); }
-  .btn-danger{ background:var(--err); color:white; border-color:#0000; }
-  .pill{ display:inline-flex; align-items:center; gap:6px; padding:2px 10px; border:1px solid var(--border); border-radius:999px; font-size:12px; background:#fff; }
-  .result{ padding:12px; border:1px dashed var(--border); border-radius:12px; background:#fffdf7; white-space:pre-wrap; }
-  .small{ font-size:12px; color:var(--muted); }
-  .grid{ display:grid; grid-template-columns: repeat(auto-fill,minmax(240px,1fr)); gap:10px; }
-  .card{ border:1px solid var(--border); border-radius:14px; padding:12px; background:#fff; }
-  .ok{ border-left:4px solid var(--green); }
-  .suggest{ border-left:4px solid var(--err); background:#fff5f7; }
-  .warn{ border-left:4px solid var(--warn); }
-  .err{ border-left:4px solid var(--err); }
-  .weekbar{ display:flex; gap:6px; }
-  .chip{ padding:6px 10px; border:1px solid var(--border); border-radius:999px; background:#fff; font-size:12px; }
-  .daycol{ border:1px dashed var(--border); border-radius:12px; padding:10px; background:#fff; }
-  .dayhdr{ display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
-  .score{ height:12px; background:#eee; border-radius:999px; overflow:hidden; position:relative; }
-  .bar{ height:100%; background: linear-gradient(90deg, var(--green), var(--star)); width:0%; }
-  .legend{ display:flex; gap:8px; flex-wrap:wrap; margin-top:6px; }
-  .legend .pill{ background:#fffdf7; }
-  .banner{ padding:8px 10px; border-radius:10px; background:#fff6; border:1px solid var(--border); }
-  .obs{ margin-top:10px; display:grid; grid-template-columns:1fr; gap:8px; }
-  .obs .item{ display:flex; gap:8px; align-items:flex-start; padding:8px; border:1px solid var(--border); border-radius:10px; background:#fff; }
-  .obs .item.good{ border-left:4px solid var(--green); }
-  .obs .item.warn{ border-left:4px solid var(--warn); }
-  .obs .emj{ font-size:18px; line-height:1; }
-  .obs .txt{ font-size:13px; color:var(--ink); }
-  details.test{ margin-top:10px; }
-  details.test summary{ cursor:pointer; }
-  footer{ text-align:center; color:var(--muted); padding:16px; font-size:12px; }
-  /* Login overlay */
-  #loginWrap{ max-width:420px; margin:40px auto; background:#fff; border:1px solid var(--border); border-radius:16px; padding:16px; box-shadow:0 6px 20px #00000014; }
-  #loginWrap h2{ margin:6px 0 12px; }
-  #loginWrap .hint{ font-size:12px; color:var(--muted); margin-top:8px; }
+  /* Header glassy */
+  header{position:sticky;top:0;z-index:40;background:var(--card-ghost);backdrop-filter:saturate(130%) blur(10px);border-bottom:1px solid var(--border)}
+  .wrap{max-width:1180px;margin:0 auto;padding:10px 16px}
+  h1{margin:0;font-size:22px;display:flex;align-items:center;gap:10px;letter-spacing:.2px}
+  h1 .badge{font-size:12px;padding:4px 10px;border-radius:999px;background:#ecfdf5;color:#065f46;border:1px solid #a7f3d0}
+  #login-bar{display:flex;gap:8px;align-items:center;justify-content:flex-end;padding:6px 16px;font-size:13px}
+  #login-bar button{border-radius:999px;border:1px solid var(--border);padding:6px 10px;background:#fff;cursor:pointer}
+
+  /* Tabs */
+  nav{display:flex;gap:10px;padding:10px 16px}
+  nav button{flex:1;padding:12px 14px;border:1px solid var(--border);background:var(--card);border-radius:999px;cursor:pointer;color:var(--muted);font-weight:700;letter-spacing:.2px;transition:all .2s ease;box-shadow:var(--shadow)}
+  nav button:hover{transform:translateY(-1px)}
+  nav button.active{background:linear-gradient(180deg, rgba(168,230,207,.9), #ffffff 60%);border-color:#b6f2de;color:#065f46}
+
+  main{max-width:1180px;margin:0 auto;padding:18px}
+
+  /* Cards */
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow)}
+  .row{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-start}
+  .col{flex:1 1 280px}
+  label{font-size:12px;color:var(--muted);font-weight:600;letter-spacing:.2px}
+  input,select,textarea,button{border-radius:14px;border:1px solid var(--border);background:#fff;color:var(--ink);padding:12px;font-size:14px;transition:border-color .2s, box-shadow .2s}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:#93c5fd;box-shadow:0 0 0 4px rgba(59,130,246,.12)}
+  input,select,textarea{width:100%}
+  button{cursor:pointer}
+
+  /* Buttons */
+  .btn{background:#f8fafc}
+  .btn.primary{background:linear-gradient(135deg, var(--brand), var(--accent-1));color:#073b2c;border-color:rgba(7,59,44,.15);font-weight:800}
+  .btn.alt{background:linear-gradient(135deg, var(--brand-2), var(--accent-2));color:#4a0f16;border-color:rgba(74,15,22,.15);font-weight:800}
+  .btn.icon{padding:8px 12px;border-radius:12px}
+
+  /* Suggestion card */
+  .suggestion{border:1px solid var(--border);border-radius:16px;padding:14px;margin:10px 0;display:flex;justify-content:space-between;gap:14px;background:#fff}
+  .suggestion .title{font-weight:800;letter-spacing:.2px}
+  .suggestion .meta{font-size:12px;color:var(--muted)}
+
+  /* List items (history & lista) */
+  .list-item{display:flex;justify-content:space-between;align-items:center;border:1px dashed var(--border);border-radius:14px;padding:10px 12px;margin:8px 0;background:#fff}
+
+  .section-title{font-weight:900;margin:14px 0 8px;letter-spacing:.2px}
+  .small{font-size:12px;color:var(--muted)}
+  .hidden{display:none}
+
+  /* Meter (accelerometer) */
+  .meter{position:relative;height:18px;border-radius:999px;background:linear-gradient(90deg,#fecaca,#fde68a,#bbf7d0);border:1px solid var(--border)}
+  .needle{position:absolute;top:-8px;transform:translateX(-50%);height:30px;width:3px;background:#111;border-radius:2px;box-shadow:0 6px 12px rgba(0,0,0,.15)}
+  .meter-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:6px}
+  .proscons{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:10px}
+  .proscons .box{border:1px solid var(--border);border-radius:14px;padding:12px;background:#fff}
+  .proscons ul{margin:6px 0 0 18px;padding:0}
+
+  /* Otras tomas en stack uniforme */
+  .stack{display:flex;flex-direction:column;gap:12px}
+  .stack .entry{display:flex;flex-direction:column;gap:6px}
+  .row-save{display:flex;gap:8px}
+  .row-save input{flex:1}
+  .row-save button{width:46px}
+
+  /* Plan semanal */
+  .plan-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+  .slot{border:1px solid var(--border);border-radius:16px;padding:10px;background:#fff;box-shadow:var(--shadow)}
+  .slot.pending{outline:2px dashed #fca5a5;background:#fff5f5}
+  .slot.confirmed{outline:2px solid #bbf7d0;background:#f0fdf4}
+  .slot .actions{display:flex;gap:8px;margin-top:8px}
+  .slot .actions .icon{padding:8px 12px;border:1px solid var(--border);border-radius:12px;background:#f3f4f6;cursor:pointer;transition:transform .15s}
+  .slot .actions .icon:hover{transform:translateY(-1px)}
+
+  /* Tests */
+  details.tests{margin:14px 0}
+  details.tests summary{cursor:pointer;font-weight:700}
+  .pass{color:#16a34a}
+  .fail{color:#b91c1c}
 </style>
 </head>
 <body>
-
 <header>
- <div class="logo" style="display:grid;place-items:center;background:#fff8;border-radius:999px;width:56px;height:56px;">
-  <!-- SVG inline: sin dependencias externas -->
-  <svg width="40" height="40" viewBox="0 0 80 80" aria-label="El Principito" role="img">
-    <!-- Estrellita -->
-    <polygon points="40,8 45,24 62,24 48,34 53,50 40,40 27,50 32,34 18,24 35,24"
-             fill="#f6c453"/>
-    <!-- Planeta -->
-    <circle cx="40" cy="58" r="16" fill="#8ecae6"/>
-    <ellipse cx="40" cy="60" rx="24" ry="8" fill="#79b6d6" opacity="0.55"/>
-    <!-- Personaje sencillo sobre el planeta -->
-    <circle cx="40" cy="40" r="5" fill="#1b1b1b"/>
-    <rect x="38" y="44" width="4" height="10" rx="2" fill="#1b1b1b"/>
-    <rect x="33" y="50" width="4" height="8" rx="2" fill="#1b1b1b"/>
-    <rect x="43" y="50" width="4" height="8" rx="2" fill="#1b1b1b"/>
-  </svg>
-</div>
-      <h1>Nicomida <small>Planificador semanal de comidas para tu peque (14–15 meses)</small></h1>
-    </div>
+  <div class="wrap" style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+    <h1>🍽️ Nicomida – Modo Simple <span class="badge">v4.3.1</span></h1>
+    <div id="login-bar">Cargando sesión…</div>
   </div>
+  <nav class="wrap">
+    <button class="active" data-tab="hoy">Hoy</button>
+    <button data-tab="plan">Plan semanal</button>
+    <button data-tab="lista">Lista</button>
+  </nav>
 </header>
 
-<!-- LOGIN -->
-<div id="loginWrap">
-  <h2>Inicia sesión</h2>
-  <div class="row">
-    <div class="col">
-      <label>Email</label>
-      <input type="email" id="loginEmail" placeholder="tu@email.com">
-    </div>
-    <div class="col">
-      <label>Contraseña</label>
-      <input type="password" id="loginPass" placeholder="••••••••">
-    </div>
-  </div>
-  <div class="row" style="margin-top:10px">
-    <button id="btnLogin" class="btn-primary">Entrar</button>
-    <button id="btnLogout" class="btn-danger" style="display:none">Cerrar sesión</button>
-  </div>
-  <div id="loginErr" class="small" style="color:var(--err);margin-top:6px"></div>
-  <div class="hint">Solo pide login la primera vez en cada móvil. Después queda recordado.</div>
-</div>
-
-<!-- APP -->
-<main id="app" style="display:none">
-  <section>
+<main>
+  <!-- HOY -->
+  <section id="hoy" class="card">
     <div class="row">
       <div class="col">
-        <label>Fecha base de la semana</label>
-        <input type="date" id="date"/>
+        <label>Fecha</label>
+        <input type="date" id="hoy-date" />
       </div>
       <div class="col">
-        <label>Turno</label>
-        <select id="turno">
-          <option value="comida">Comida (mediodía)</option>
-          <option value="cena">Cena (noche)</option>
-        </select>
+        <label>Turno principal</label>
+        <select id="hoy-turno"><option value="comida">Comida</option><option value="cena">Cena</option></select>
       </div>
-      <div class="col" style="align-self:end; display:flex; gap:8px;">
-        <button class="btn-primary" id="btnSugerirDia">Sugerir para día/turno</button>
-        <button id="btnPlanSemana" class="btn-accent">🪐 Planificar semana entera</button>
-        <button id="btnResumenPrev">📜 Resumen semana anterior</button>
+      <div class="col" style="align-self:end"><button class="btn primary" id="btn-hoy-sugerir">Sugerir ideas</button></div>
+    </div>
+
+    <div id="hoy-sug-list" class="row" style="margin-top:10px"></div>
+
+    <div class="section-title">¿Le diste otra cosa en la <span id="label-turno">Comida</span>? (texto libre)</div>
+    <div class="row">
+      <div class="col"><input id="alt-plato" placeholder="Ej.: aguacate con pasta corta y calabacín, con aceite de oliva" /></div>
+      <div class="col" style="align-self:end"><button class="btn" id="btn-parse-alt">💾 Guardar alternativa</button></div>
+    </div>
+
+    <div class="section-title">Otras tomas del día</div>
+    <div class="stack">
+      <div class="entry">
+        <label>Desayuno</label>
+        <div class="row-save"><input id="txt-desayuno" placeholder="leche con avena y kiwi" /><button class="btn" id="save-des">💾</button></div>
+      </div>
+      <div class="entry">
+        <label>Snack mañana</label>
+        <div class="row-save"><input id="txt-snack" placeholder="yogur con plátano" /><button class="btn" id="save-snack">💾</button></div>
+      </div>
+      <div class="entry">
+        <label>Merienda</label>
+        <div class="row-save"><input id="txt-merienda" placeholder="pera y galleta de avena" /><button class="btn" id="save-mer">💾</button></div>
       </div>
     </div>
-    <div class="small banner" id="estadoSemana"></div>
+
+    <div class="section-title">Puntaje nutricional del día</div>
+    <div class="meter" id="meter"><div class="needle" id="needle" style="left:50%"></div></div>
+    <div class="meter-labels"><span>0</span><span>2</span><span>4</span><span>6</span><span>8</span><span>10</span></div>
+    <div class="proscons">
+      <div class="box"><b>✅ Puntos a favor</b><ul id="pros-list"></ul></div>
+      <div class="box"><b>⚠️ Lo que faltó/mejorar</b><ul id="cons-list"></ul></div>
+    </div>
+
+    <div class="section-title">Historial del día</div>
+    <div id="hoy-historial"></div>
   </section>
 
-  <!-- SUGERENCIA ACTUAL (arriba) -->
-  <section>
-    <h2>⭐ Sugerencia actual</h2>
-    <div id="sugerencia" class="result"></div>
+  <!-- PLAN -->
+  <section id="plan" class="card hidden">
+    <div class="small">Rellena ideas (rojo = pendiente). Confirma (verde) o 🔄 regenera por comida. Puedes <b>editar a mano</b> cada casilla.</div>
     <div class="row" style="margin-top:8px">
-      <button id="btnConfirmar" class="btn-primary">✅ Confirmar que la comió</button>
-      <button id="btnOtra" class="">🔁 Dame otra opción</button>
-      <div style="flex:1"></div>
-      <input type="text" id="inputManual" placeholder="o escribe aquí lo que realmente comió…" />
-      <button id="btnRegistrarManual" class="">✏️ Registrar texto</button>
+      <div class="col"><label>Semana que empieza</label><input type="date" id="week-start" /></div>
+      <div class="col" style="align-self:end"><button class="btn alt" id="btn-auto-plan">Rellenar con ideas</button><button class="btn" id="btn-guardar-plan">Guardar plan</button></div>
     </div>
+    <div id="plan-grid" class="plan-grid" style="margin-top:12px"></div>
+    <div class="small" id="plan-msg"></div>
   </section>
 
-  <section>
-    <h2>🌙 Semana actual <span id="weekLabel" class="small"></span></h2>
-    <div id="weekGrid" class="grid"></div>
-  </section>
-
-  <section>
-    <h2>📈 Progreso semanal</h2>
-    <div class="card">
-      <div class="score"><div id="scoreBar" class="bar"></div></div>
-      <div id="scoreMsg" class="small" style="margin-top:6px"></div>
-      <div class="legend">
-        <span class="pill">🐟 Pescado objetivo: 2/sem</span>
-        <span class="pill">🥚 Huevo objetivo: 1–3/sem</span>
-        <span class="pill">🌱 Legumbre objetivo: 2/sem</span>
-        <span class="pill">🥩 Carne roja máx: 1/sem</span>
-        <span class="pill">🍗 Carne blanca: 2–4/sem</span>
-      </div>
-      <div id="observaciones" class="obs"></div>
+  <!-- LISTA -->
+  <section id="lista" class="card hidden">
+    <div class="row" style="margin-top:8px">
+      <div class="col"><label>Desde</label><input type="date" id="list-from" /></div>
+      <div class="col"><label>Hasta</label><input type="date" id="list-to" /></div>
+      <div class="col" style="align-self:end"><button class="btn primary" id="btn-generar-lista">Generar lista</button><button class="btn" id="btn-copiar-lista">Copiar</button></div>
     </div>
+    <div id="lista-contenido" style="margin-top:10px"></div>
   </section>
 
-  <section>
-    <h2>📜 Resumen semana anterior & Lista de la compra</h2>
-    <div id="resumenPrev" class="grid"></div>
-    <div id="listaCompra" class="card" style="display:none"></div>
-  </section>
-
-  <details class="test">
-    <summary>🧪 Diagnóstico (tests internos)</summary>
-    <pre id="testLog" class="small"></pre>
+  <!-- AUTOTESTS -->
+  <details class="tests card" style="margin-top:10px">
+    <summary>🔧 Autotests (diagnóstico rápido)</summary>
+    <ul id="test-results" class="small"></ul>
   </details>
 </main>
 
-<footer>
-  Nicomida — hecho con ✨ para familias ocupadas. Ajusta con tu criterio y el del pediatra.
-</footer>
+<script>
+// ===== Util
+const $ = s=>document.querySelector(s); const $$=s=>Array.from(document.querySelectorAll(s));
+const todayStr=()=> new Date().toISOString().slice(0,10);
+const weekDays=["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"];
+const mealLabels={desayuno:"Desayuno", snack_am:"Snack mañana", comida:"Comida", merienda:"Merienda", cena:"Cena"};
 
-<!-- Firebase (ES6 modules desde CDN oficial) -->
+// ===== Estado (soporta sesión: uid -> clave)
+const KEY_BASE='nicomida_v43';
+let CURRENT_UID=null; // null = anónimo
+function storageKey(){ return `${KEY_BASE}_${CURRENT_UID||'anon'}`; }
+// Intenta migrar automáticamente desde claves antiguas (no romper lo anterior)
+function readLegacyState(){
+  try{
+    const keys = Object.keys(localStorage).filter(k=>k.startsWith('nicomida_v') || k==='nicomida');
+    for(const k of keys){
+      try{ const obj = JSON.parse(localStorage.getItem(k)); if(obj && typeof obj==='object' && 'logs' in obj && 'plans' in obj) return obj; }catch(_){ }
+    }
+  }catch(_){ }
+  return {logs:{}, plans:{}};
+}
+let state=load();
+function load() {
+  try {
+    const cur = localStorage.getItem(storageKey());
+    if(cur){ return JSON.parse(cur) || { logs: {}, plans: {} }; }
+    // Si no hay estado para la clave actual, trae el legado
+    return readLegacyState();
+  } catch (e) {
+    return { logs: {}, plans: {} };
+  }
+}, plans: {} };
+  } catch (e) {
+    return { logs: {}, plans: {} };
+  }
+}
+function save(){
+  localStorage.setItem(storageKey(), JSON.stringify(state));
+  // Además, si hay usuario y Firestore disponible, sincroniza
+  if(window.db && CURRENT_UID){
+    const docRef = window._docRef;
+    if(docRef){
+      const payload = {updatedAt: Date.now(), data: state};
+      window._saveQueue = window._saveQueue || 0;
+      clearTimeout(window._saveDebounce);
+      window._saveDebounce = setTimeout(async ()=>{
+        try{ window._saveQueue++; await window.setDoc(docRef, payload, {merge:true}); }catch(err){ console.warn('Firestore save error', err); }
+        finally{ window._saveQueue--; }
+      }, 400);
+    }
+  }
+}
+
+// ===== Léxico / categorías
+const PROH={ ingredientes:["tomate","remolacha"], nocturnos:["brócoli","brocoli"], maxEggs:5, maxLentejas:1, maxRedMeat:1 };
+const LEX={
+  'aceite de oliva':{norm:'aceite de oliva', cats:['grasa']}, 'aceite':{norm:'aceite de oliva', cats:['grasa']},
+  'pasta corta':{norm:'pasta', cats:['cereal']}, 'pasta':{norm:'pasta', cats:['cereal']}, 'fideos':{norm:'pasta', cats:['cereal']},
+  'arroz':{norm:'arroz', cats:['cereal']}, 'quinoa':{norm:'quinoa', cats:['cereal']}, 'cuscús':{norm:'cuscús', cats:['cereal']}, 'cous cous':{norm:'cuscús', cats:['cereal']}, 'pan':{norm:'pan', cats:['cereal']}, 'avena':{norm:'avena', cats:['cereal']},
+  'patata':{norm:'patata', cats:['tubérculo']}, 'boniato':{norm:'boniato', cats:['tubérculo']},
+  'pollo':{norm:'pollo', cats:['proteína','carne_blanca']}, 'pavo':{norm:'pavo', cats:['proteína','carne_blanca']}, 'ternera':{norm:'ternera', cats:['proteína','carne_roja']}, 'tortilla':{norm:'huevo', cats:['proteína','huevo']},
+  'huevo':{norm:'huevo', cats:['proteína','huevo']}, 'lentejas':{norm:'lentejas', cats:['proteína','legumbre']}, 'garbanzos':{norm:'garbanzos', cats:['proteína','legumbre']},
+  'merluza':{norm:'merluza', cats:['proteína','pescado_blanco']}, 'pescado blanco':{norm:'merluza', cats:['proteína','pescado_blanco']}, 'salmón':{norm:'salmón', cats:['proteína','pescado_azul']}, 'salmon':{norm:'salmón', cats:['proteína','pescado_azul']},
+  'calabaza':{norm:'calabaza', cats:['verdura']}, 'calabacín':{norm:'calabacín', cats:['verdura']}, 'calabacin':{norm:'calabacín', cats:['verdura']},
+  'zanahoria':{norm:'zanahoria', cats:['verdura']}, 'brócoli':{norm:'brócoli', cats:['verdura']}, 'brocoli':{norm:'brócoli', cats:['verdura']}, 'cebolla':{norm:'cebolla', cats:['verdura']}, 'berenjena':{norm:'berenjena', cats:['verdura']}, 'maíz':{norm:'maíz', cats:['cereal']}, 'maiz':{norm:'maíz', cats:['cereal']},
+  'aguacate':{norm:'aguacate', cats:['fruta','grasa']}, 'manzana':{norm:'manzana', cats:['fruta']}, 'pera':{norm:'pera', cats:['fruta']}, 'plátano':{norm:'plátano', cats:['fruta']}, 'platano':{norm:'plátano', cats:['fruta']}, 'kiwi':{norm:'kiwi', cats:['fruta']},
+  'leche':{norm:'leche', cats:['lácteo']}, 'yogur':{norm:'yogur', cats:['lácteo']}, 'queso fresco':{norm:'queso fresco', cats:['lácteo']}
+};
+const MULTI=Object.keys(LEX).filter(k=>k.includes(' ')).sort((a,b)=>b.length-a.length);
+function toAsciiLower(s){ const map={"á":"a","é":"e","í":"i","ó":"o","ú":"u","ü":"u","ñ":"n"}; return s.toLowerCase().split('').map(ch=>map[ch]||ch).join(''); }
+function parseFree(text){ const original=text.trim(); if(!original) return null; let t=' '+toAsciiLower(original)+' '; const found=new Set(), cats=new Set(); MULTI.forEach(ph=>{ const p=' '+toAsciiLower(ph)+' '; if(t.includes(p)){ found.add(LEX[ph].norm); LEX[ph].cats.forEach(c=>cats.add(c)); t=t.split(p).join(' ');} }); t.split(/,| y | con | de |\+/g).map(s=>s.trim()).filter(Boolean).forEach(tok=>{ tok=tok.replace(/\b\d+[\wªº]*\b/g,'').trim(); if(!tok) return; const k=LEX[tok]?tok:(tok.endsWith('s')?tok.slice(0,-1):tok); if(LEX[k]){ found.add(LEX[k].norm); LEX[k].cats.forEach(c=>cats.add(c)); } }); [...found].forEach(i=>{ if(PROH.ingredientes.includes(i)) found.delete(i); }); return {dish:original, ingredients:[...found], categories:[...cats], ts:Date.now()}; }
+
+// ===== Banco de ideas (sin cantidades, siempre P+C+V)
+const BANK={
+  base:[
+    {title:"Pollo con arroz y calabacín", ing:['pollo','arroz','calabacín','aceite de oliva']},
+    {title:"Pavo con boniato y zanahoria", ing:['pavo','boniato','zanahoria','aceite de oliva']},
+    {title:"Ternera con patata y calabaza", ing:['ternera','patata','calabaza','aceite de oliva']},
+    {title:"Merluza con patata y calabacín", ing:['merluza','patata','calabacín','aceite de oliva']},
+    {title:"Salmón con arroz y calabaza", ing:['salmón','arroz','calabaza','aceite de oliva']},
+    {title:"Garbanzos con arroz y verduras", ing:['garbanzos','arroz','calabacín','zanahoria','aceite de oliva']},
+    {title:"Cuscús con pollo y calabaza", ing:['cuscús','pollo','calabaza','aceite de oliva']},
+    {title:"Pasta corta con merluza y calabacín", ing:['pasta','merluza','calabacín','aceite de oliva']}
+  ]
+};
+
+function ingCats(ing){ const cats=new Set(); (ing||[]).forEach(i=> (LEX[i]?.cats||[]).forEach(c=>cats.add(c))); return cats; }
+function isBalanced(ing){ const cats=ingCats(ing); const hasP=cats.has('proteína'); const hasC=cats.has('cereal')||cats.has('tubérculo'); const hasV=cats.has('verdura'); return hasP && hasC && hasV; }
+
+// ===== Contexto día/semana
+function weekStartOf(dateStr){ const d=new Date(dateStr); const day=(d.getUTCDay()+6)%7; d.setUTCDate(d.getUTCDate()-day); return d.toISOString().slice(0,10); }
+function inWeekRange(dateStr, weekStart){ const d=new Date(dateStr); const w=new Date(weekStart); const diff=(d-w)/86400000; return diff>=0 && diff<7; }
+function countersWeek(weekStart){ let eggs=0, lent=0, red=0; for(const d in state.logs){ if(inWeekRange(d,weekStart)){ const day=state.logs[d]; Object.values(day).forEach(e=>{ const ing=e?.ingredients||[]; if(ing.includes('huevo')) eggs++; if(ing.includes('lentejas')) lent++; if(ing.includes('ternera')) red++; }); } } return {eggs,lent,red}; }
+
+// ===== allowedFor compatible (string o array)
+function allowedFor(turno, x){ let tlist=[]; if(Array.isArray(x)) tlist=x; else if(typeof x==='string'){ const low=x.toLowerCase(); if(low.includes('tomate')||low.includes('remolacha')) return false; if(turno==='cena' && (low.includes('brócoli')||low.includes('brocoli'))) return false; return true; } tlist=(tlist||[]).map(s=> (''+s).toLowerCase()); if(tlist.some(s=> PROH.ingredientes.includes(s))) return false; if(turno==='cena' && (tlist.includes('brócoli')||tlist.includes('brocoli'))) return false; return true; }
+
+// ===== Generador consciente de contexto
+function preferByContext(turno, dateStr, weekStart, cand){
+  const today=state.logs[dateStr]||{}; const dayCats=new Set(); Object.values(today).forEach(e=> (e?.ingredients||[]).forEach(i=> (LEX[i]?.cats||[]).forEach(c=>dayCats.add(c))));
+  const w=countersWeek(weekStart);
+  return cand.filter(item=>{
+    const cats=ingCats(item.ing);
+    if(item.ing.includes('huevo') && w.eggs>=PROH.maxEggs) return false;
+    if(item.ing.includes('lentejas') && w.lent>=PROH.maxLentejas) return false;
+    if(item.ing.includes('ternera') && w.red>=PROH.maxRedMeat) return false;
+    if(dayCats.has('carne_blanca')||dayCats.has('carne_roja')){
+      if(cats.has('carne_blanca')||cats.has('carne_roja')) return false;
+    }
+    if(turno==='cena' && (cats.has('carne_blanca')||cats.has('carne_roja'))){ return false; }
+    return true;
+  });
+}
+function candidates(turno, dateStr){ const ws=weekStartOf(dateStr); let cand=[...BANK.base].map(x=>({title:x.title, ing:[...x.ing]})); cand=cand.filter(x=> isBalanced(x.ing) && allowedFor(turno,x.ing)); let filtered=preferByContext(turno, dateStr, ws, cand); if(!filtered.length) filtered=cand; return filtered; }
+function pickIdea(turno, dateStr){ const list=candidates(turno,dateStr); return list[Math.floor(Math.random()*list.length)]; }
+
+// ===== Registro / historial
+function addLog(date, turno, entry){ if(!state.logs[date]) state.logs[date]={}; state.logs[date][turno]=entry; save(); }
+function renderDayHistory(date){ const box=$('#hoy-historial'); box.innerHTML=''; const day=state.logs[date]||{}; ['desayuno','snack_am','comida','merienda','cena'].forEach(t=>{ if(day[t]){ const it=day[t]; const el=document.createElement('div'); el.className='list-item'; el.innerHTML=`<div><div><b>${mealLabels[t]}</b>: ${it.dish||''}</div><div class="small">${(it.ingredients||[]).join(', ')}</div></div><button class="btn">Eliminar</button>`; el.querySelector('button').onclick=()=>{ delete day[t]; save(); renderDayHistory(date); updateMeter(); }; box.appendChild(el); } }); updateMeter(); }
+
+// ===== Sugerencias de HOY
+function renderHoySuggestions(){ const turno=$('#hoy-turno').value; const date=$('#hoy-date').value; const list=$('#hoy-sug-list'); list.innerHTML=''; const ids=new Set(); for(let i=0;i<6 && ids.size<4;i++){ const it=pickIdea(turno,date); if(!it||ids.has(it.title)) continue; ids.add(it.title); const el=document.createElement('div'); el.className='suggestion'; el.innerHTML=`<div><div style="font-weight:700">${it.title}</div><div class="small">${it.ing.join(', ')}</div></div><div style="display:flex;gap:8px;align-items:center"><button class="btn alt">Planear</button><button class="btn primary">Registrar</button></div>`; const [planBtn,regBtn]=el.querySelectorAll('button'); planBtn.onclick=()=> quickPlanFromSuggestionStruct(it); regBtn.onclick=()=>{ const date=$('#hoy-date').value; const turno=$('#hoy-turno').value; const cats=ingCats(it.ing); addLog(date, turno, {dish:it.title, ingredients:it.ing, categories:[...cats], ts:Date.now()}); renderDayHistory(date); }; list.appendChild(el); }
+}
+
+// ===== Acelerómetro (evalúa comida y cena completas)
+function mealCompleteness(e){ if(!e) return 0; const cats=new Set(e.categories||[]); const hasP=cats.has('proteína'); const hasC=cats.has('cereal')||cats.has('tubérculo'); const hasV=cats.has('verdura'); let s=0; if(hasP) s+=0.4; if(hasC) s+=0.3; if(hasV) s+=0.3; return s; }
+function updateMeter(){ const date=$('#hoy-date').value; const day=state.logs[date]||{}; const pros=[], cons=[]; const scMeal=mealCompleteness(day.comida); const scDinner=mealCompleteness(day.cena); if(scMeal===1) pros.push('Comida completa (P+C+V)'); else cons.push('Completar la comida con P+C+V'); if(scDinner===1) pros.push('Cena completa (P+C+V)'); else cons.push('Completar la cena con P+C+V'); const catsDay=new Set(); Object.values(day).forEach(e=> (e?.categories||[]).forEach(c=>catsDay.add(c)) ); if(catsDay.has('fruta')) pros.push('Incluiste fruta'); else cons.push('Añadir fruta en alguna toma'); if(catsDay.has('grasa')||catsDay.has('grasa saludable')) pros.push('Grasa saludable presente'); let score=(scMeal+scDinner)*5; const w=countersWeek(weekStartOf(date)); if(w.eggs>PROH.maxEggs){ score-=1; cons.push('Huevo >5/sem'); } if(w.lent>PROH.maxLentejas){ score-=0.5; cons.push('Lentejas >1/sem'); } if(w.red>PROH.maxRedMeat){ score-=0.5; cons.push('Carne roja >1/sem'); } if(day.cena && (day.cena.ingredients||[]).includes('brócoli')){ score-=0.8; cons.push('Evitar brócoli por la noche'); } score=Math.max(0,Math.min(10,Math.round(score*2)/2)); $('#needle').style.left=(score*10)+'%'; $('#pros-list').innerHTML=pros.map(x=>`<li>${x}</li>`).join(''); $('#cons-list').innerHTML=cons.filter((v,i,a)=>a.indexOf(v)===i).map(x=>`<li>${x}</li>`).join(''); }
+
+// ===== Plan semanal (editable + consciente de contexto)
+function ensurePlan(ws){ if(!state.plans[ws]) state.plans[ws]=Array.from({length:7},()=>({comida:{},cena:{}})); }
+function renderPlan(){ const grid=$('#plan-grid'); const ws=$('#week-start').value; ensurePlan(ws); grid.innerHTML=''; const week=state.plans[ws]; week.forEach((day,idx)=>{ const card=document.createElement('div'); card.className='card'; const date=new Date(ws); date.setUTCDate(date.getUTCDate()+idx); const ds=date.toISOString().slice(0,10);
+  const slot=(t)=>{ const s=day[t]||{}; const st=s.confirmed?'confirmed':'pending'; return `<div class="slot ${st}" data-idx="${idx}" data-t="${t}"><div class="small"><b>${t==='comida'?'Comida':'Cena'}</b> <span class="small" style="opacity:.7">${ds}</span></div><input class="inp" value="${s.title||''}" placeholder="Idea de ${t}" /><div class="actions"><span class="icon regen" title="Regenerar">🔄</span><span class="icon confirm" title="Confirmar">✅</span></div></div>`; };
+  card.innerHTML=`<div style="font-weight:700;margin-bottom:6px">${weekDays[idx]}</div><div class="plan-grid">${slot('comida')}${slot('cena')}</div>`; grid.appendChild(card); });
+  $$('#plan-grid .slot').forEach(sl=>{ const idx=+sl.dataset.idx; const t=sl.dataset.t; const inp=sl.querySelector('.inp'); inp.oninput=e=>{ const ws=$('#week-start').value; const val=e.target.value; const parsed=parseFree(val)||{}; state.plans[ws][idx][t].title=val; state.plans[ws][idx][t].ing=parsed.ingredients||[]; state.plans[ws][idx][t].categories=parsed.categories||[]; save(); }; sl.querySelector('.regen').onclick=()=>{ const ws=$('#week-start').value; const date=new Date(ws); date.setUTCDate(date.getUTCDate()+idx); const ds=date.toISOString().slice(0,10); const idea=pickIdea(t, ds); state.plans[ws][idx][t]={title:idea.title, ing:idea.ing, categories:[...ingCats(idea.ing)], confirmed:false}; save(); renderPlan(); }; sl.querySelector('.confirm').onclick=()=>{ const ws=$('#week-start').value; const s=state.plans[ws][idx][t]; if(!s?.title) return alert('Escribe o genera una idea'); let ing=s.ing && s.ing.length? s.ing : (parseFree(s.title)||{}).ingredients || []; if(!isBalanced(ing)){ const cats=ingCats(ing); if(!(cats.has('cereal')||cats.has('tubérculo'))) ing.push('arroz'); if(!cats.has('verdura')) ing.push('calabacín'); if(!cats.has('proteína')) ing.push('pollo'); } s.ing=ing; s.categories=[...ingCats(ing)]; s.confirmed=true; save(); renderPlan(); }; }); }
+
+function autoPlan(){ const ws=$('#week-start').value; ensurePlan(ws); for(let i=0;i<7;i++){ const d=new Date(ws); d.setUTCDate(d.getUTCDate()+i); const ds=d.toISOString().slice(0,10); const c=pickIdea('comida',ds); const z=pickIdea('cena',ds); state.plans[ws][i].comida={title:c.title, ing:c.ing, categories:[...ingCats(c.ing)], confirmed:false}; state.plans[ws][i].cena={title:z.title, ing:z.ing, categories:[...ingCats(z.ing)], confirmed:false}; } save(); renderPlan(); }
+
+function quickPlanFromSuggestionStruct(item){ const ws=$('#week-start').value||weekStartOf($('#hoy-date').value); ensurePlan(ws); const a=new Date(ws), b=new Date($('#hoy-date').value); const idx=Math.round((b-a)/86400000); if(idx<0||idx>6) return alert('La fecha no está en la semana seleccionada'); const t=$('#hoy-turno').value; if(!allowedFor(t,item.ing)) return alert('Sugerencia incompatible con tus reglas'); state.plans[ws][idx][t]={title:item.title, ing:item.ing, categories:[...ingCats(item.ing)], confirmed:false}; save(); renderPlan(); }
+
+// ===== Lista de la compra (logs + plan confirmado)
+function generateList(){ const from=$('#list-from').value, to=$('#list-to').value; const items=new Set(); for(const date in state.logs){ if(date>=from&&date<=to){ Object.values(state.logs[date]).forEach(e=> (e.ingredients||[]).forEach(i=> items.add(i))); }} const ws=weekStartOf(from); (state.plans[ws]||[]).forEach((d,di)=>{ const dayDate=new Date(ws); dayDate.setUTCDate(dayDate.getUTCDate()+di); const ds=dayDate.toISOString().slice(0,10); if(ds>=from&&ds<=to){ ['comida','cena'].forEach(t=>{ const s=d[t]; if(s?.confirmed) (s.ing|| (parseFree(s.title)||{}).ingredients || []).forEach(i=> items.add(i)); }); } }); PROH.ingredientes.forEach(p=> items.delete(p)); const cont=$('#lista-contenido'); const arr=[...items].sort(); cont.innerHTML= arr.length? arr.map(i=>`<div class="list-item"><span>${i}</span><button class="btn">✔️</button></div>`).join(''): '<div class="small">No hay ingredientes en el rango.</div>'; }
+function copyList(){ const items=[...$('#lista-contenido').querySelectorAll('.list-item span')].map(el=>el.textContent); navigator.clipboard.writeText(items.join('\n')).then(()=>alert('Lista copiada ✅')); }
+
+// ===== Tabs & init
+function setTab(id){ ['hoy','plan','lista'].forEach(x=> $('#'+x).classList.toggle('hidden', x!==id)); $$('nav button').forEach(b=> b.classList.toggle('active', b.dataset.tab===id)); }
+$$('nav button').forEach(b=> b.onclick=()=> setTab(b.dataset.tab));
+
+function init(){ $('#hoy-date').value=todayStr(); $('#week-start').value=weekStartOf(todayStr()); $('#list-from').value=weekStartOf(todayStr()); const to=new Date($('#list-from').value); to.setUTCDate(to.getUTCDate()+6); $('#list-to').value=to.toISOString().slice(0,10); $('#label-turno').textContent=$('#hoy-turno').selectedOptions[0].textContent; renderHoySuggestions(); renderDayHistory($('#hoy-date').value); renderPlan(); }
+
+// Eventos HOY
+$('#btn-hoy-sugerir').onclick=renderHoySuggestions; $('#hoy-turno').onchange=()=> $('#label-turno').textContent=$('#hoy-turno').selectedOptions[0].textContent; $('#btn-parse-alt').onclick=()=>{ const s=$('#alt-plato').value.trim(); if(!s) return alert('Escribe la alternativa'); const e=parseFree(s); const date=$('#hoy-date').value; const turno=$('#hoy-turno').value; addLog(date, turno, e); $('#alt-plato').value=''; renderDayHistory(date); };
+$('#save-des').onclick=()=>{ const v=$('#txt-desayuno').value.trim(); if(!v) return; const d=$('#hoy-date').value; addLog(d,'desayuno',parseFree(v)); $('#txt-desayuno').value=''; renderDayHistory(d); };
+$('#save-snack').onclick=()=>{ const v=$('#txt-snack').value.trim(); if(!v) return; const d=$('#hoy-date').value; addLog(d,'snack_am',parseFree(v)); $('#txt-snack').value=''; renderDayHistory(d); };
+$('#save-mer').onclick=()=>{ const v=$('#txt-merienda').value.trim(); if(!v) return; const d=$('#hoy-date').value; addLog(d,'merienda',parseFree(v)); $('#txt-merienda').value=''; renderDayHistory(d); };
+$('#hoy-date').onchange=()=> renderDayHistory($('#hoy-date').value);
+
+// Plan
+$('#btn-auto-plan').onclick=autoPlan; $('#btn-guardar-plan').onclick=()=>{ save(); alert('Plan guardado ✅'); }; $('#week-start').onchange=renderPlan;
+
+// Lista
+$('#btn-generar-lista').onclick=generateList; $('#btn-copiar-lista').onclick=copyList;
+
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', init); else init();
+
+// ===== Autotests =====
+function runTests(){ const results=[]; const ok=(name,cond)=>results.push({name,pass:!!cond});
+  try{
+    const p1=parseFree('leche con avena y kiwi'); ok('parser: leche/avena/kiwi', p1 && ['leche','avena','kiwi'].every(x=>p1.ingredients.includes(x)));
+    ok('parser: categorías lácteo/cereal/fruta', p1 && p1.categories.includes('lácteo') && p1.categories.includes('cereal') && p1.categories.includes('fruta'));
+    const p2=parseFree('tortilla de calabacín'); ok('parser: tortilla incluye huevo', p2 && p2.ingredients.includes('huevo')); ok('parser: verdura presente', p2 && p2.ingredients.includes('calabacín'));
+    const p3=parseFree('tomate y remolacha'); ok('parser: filtra prohibidos', p3 && p3.ingredients.length===0);
+    ok('regla cena: no brócoli (string)', !allowedFor('cena','Arroz con brócoli'));
+    ok('regla cena: no brócoli (array)', !allowedFor('cena',['arroz','brócoli']));
+    const backup=localStorage.getItem(storageKey()); localStorage.setItem(storageKey(), JSON.stringify({logs:{},plans:{}})); const loaded=load(); ok('load(): objeto válido', loaded && typeof loaded==='object' && 'logs' in loaded && 'plans' in loaded); if(backup===null) localStorage.removeItem(storageKey()); else localStorage.setItem(storageKey(), backup);
+    try{ const prev=$('#hoy-date').value; $('#hoy-date').value=todayStr(); state.logs[$('#hoy-date').value]={}; updateMeter(); $('#hoy-date').value=prev; ok('updateMeter: seguro con día vacío', true);}catch(e){ ok('updateMeter: seguro con día vacío', false); }
+    ok('DOM: existe #test-results', !!document.querySelector('#test-results'));
+    ok('parseFree: null para cadena vacía', parseFree('   ')===null);
+    // Generador balanceado
+    const idea=pickIdea('comida', todayStr()); ok('idea balanceada', idea && isBalanced(idea.ing));
+    // Cena evita carne si hubo carne al mediodía
+    const d=todayStr(); state.logs[d]={comida:{ingredients:['pollo'],categories:[...ingCats(['pollo'])]}}; const dinner=pickIdea('cena', d); const dinnerCats=ingCats(dinner.ing); ok('cena evita carne tras carne al mediodía', !(dinnerCats.has('carne_blanca')||dinnerCats.has('carne_roja')));
+    // Semanal: limita carne roja
+    const ws=weekStartOf(d); for(let i=0;i<7;i++){ const dt=new Date(ws); dt.setUTCDate(dt.getUTCDate()+i); const ds=dt.toISOString().slice(0,10); state.logs[ds]={comida:{ingredients:['ternera'],categories:[...ingCats(['ternera'])]}}; }
+    const noRed=candidates('comida',d).every(x=> !x.ing.includes('ternera')); ok('no sugiere ternera si ya se alcanzó el máximo semanal', noRed);
+    // generateList no lanza
+    try{ $('#list-from').value=ws; const to=new Date(ws); to.setUTCDate(to.getUTCDate()+6); $('#list-to').value=to.toISOString().slice(0,10); generateList(); ok('generateList: sin excepciones', true);}catch(e){ ok('generateList: sin excepciones', false); }
+  }catch(err){ ok('Autotests: ejecución sin excepciones', false); console.error('Autotests error:', err); }
+  const ul=document.querySelector('#test-results'); if(ul){ ul.innerHTML=''; results.forEach(r=>{ const li=document.createElement('li'); li.className=r.pass?'pass':'fail'; li.textContent=(r.pass?'✔ ':'✖ ')+r.name; ul.appendChild(li); }); } console[results.every(r=>r.pass)?'log':'error']('Autotests:', results); }
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', runTests); else runTests();
+</script>
+
+<!-- ===== Firebase (Auth + Firestore) OPCIONAL. Usa la misma config de ANTES si está presente ===== -->
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-  import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-  import { getFirestore, doc, setDoc, getDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-
-  // === TU CONFIG DE FIREBASE (ya aportada) ===
-  const firebaseConfig = {
-    apiKey: "AIzaSyBnKtr2wEFTlgc9GRmbzKvn1DhkBpnEZy4",
-    authDomain: "nicomida.firebaseapp.com",
-    projectId: "nicomida",
-    storageBucket: "nicomida.firebasestorage.app",
-    messagingSenderId: "466859827970",
-    appId: "1:466859827970:web:28619d830178a1b913d81b"
-  };
-
-  // Inicializar Firebase
-  const appFB = initializeApp(firebaseConfig);
-  const auth = getAuth(appFB);
-  const db = getFirestore(appFB);
-  await setPersistence(auth, browserLocalPersistence); // recuerda sesión
-
-  // ====== LOGIN UI ======
-  const loginWrap = document.getElementById('loginWrap');
-  const app = document.getElementById('app');
-  const btnLogin = document.getElementById('btnLogin');
-  const btnLogout = document.getElementById('btnLogout');
-  const loginErr = document.getElementById('loginErr');
-
-  btnLogin.addEventListener('click', async ()=>{
-    const email = (document.getElementById('loginEmail').value||'').trim();
-    const pass  = (document.getElementById('loginPass').value||'').trim();
-    loginErr.textContent='';
+  // *** No cambies nada si ya tenías tu config ***
+  // La app intentará leer en este orden:
+  // 1) <script id="firebase-config">{...}</script> (JSON inline)
+  // 2) window.FIREBASE_CONFIG o window.firebaseConfig o window.__FBCONFIG (inyectado por tu archivo anterior)
+  // 3) Si no hay config, funciona en modo localStorage sin login.
+  function getExistingFirebaseConfig(){
     try{
-      await signInWithEmailAndPassword(auth, email, pass);
+      const tag = document.getElementById('firebase-config');
+      if(tag && tag.textContent){ return JSON.parse(tag.textContent); }
+    }catch(_){ }
+    return window.FIREBASE_CONFIG || window.firebaseConfig || window.__FBCONFIG || null;
+  }
+  const firebaseConfig = getExistingFirebaseConfig();
+  if(!firebaseConfig){
+    console.warn('Sin firebaseConfig: modo localStorage (sin login)');
+    document.getElementById('login-bar').innerHTML = `<span style="color:#6b7280">Modo sin login</span>`;
+  } else {
+    try{
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+      import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+      import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const db = getFirestore(app);
+      window.db = db; // expone para save()
+      window.setDoc = setDoc; // para save() con debounce
+
+      const loginBar = document.getElementById('login-bar');
+      const provider = new GoogleAuthProvider();
+      window._docRef = null;
+
+      async function loadRemote(uid){
+        window._docRef = doc(db, 'nicomida_users', uid);
+        const snap = await getDoc(window._docRef);
+        if(snap.exists()){
+          const remote = snap.data()?.data;
+          if(remote && typeof remote === 'object'){
+            const local = state || {logs:{},plans:{}};
+            state = { logs: {...local.logs, ...remote.logs}, plans: {...local.plans, ...remote.plans} };
+            save();
+          }
+        } else {
+          await setDoc(window._docRef, {createdAt: Date.now(), data: state});
+        }
+      }
+
+      function renderLogin(user){
+        if(user){
+          loginBar.innerHTML = `👋 ${user.displayName || user.email} · <button id="btn-out">Salir</button>`;
+          document.getElementById('btn-out').onclick = ()=> signOut(auth);
+        } else {
+          loginBar.innerHTML = `<button id="btn-in">Entrar con Google</button>`;
+          document.getElementById('btn-in').onclick = ()=> signInWithPopup(auth, provider);
+        }
+      }
+
+      onAuthStateChanged(auth, async (user)=>{
+        CURRENT_UID = user ? user.uid : null;
+        state = load(); // recarga con clave por uid ANTES de mezclar remoto
+        renderLogin(user);
+        if(user){ await loadRemote(user.uid); }
+        try{ renderDayHistory(document.getElementById('hoy-date').value); renderPlan(); }catch(e){}
+      });
     }catch(e){
-      loginErr.textContent = 'Error: ' + e.message;
+      console.warn('Firebase no cargó; usando solo localStorage', e);
+      const loginBar = document.getElementById('login-bar');
+      loginBar.innerHTML = `<span style=\"color:#6b7280\">Modo sin login</span>`;
     }
-  });
-  btnLogout.addEventListener('click', async ()=>{ await signOut(auth); });
+  }
+</script>
 
-  onAuthStateChanged(auth, (user)=>{
-    if(user){
-      loginWrap.style.display='none';
-      btnLogout.style.display='inline-flex';
-      app.style.display='block';
-      onLoginReady();
-    }else{
-      loginWrap.style.display='block';
-      btnLogout.style.display='none';
-      app.style.display='none';
-    }
-  });
-
-  // ====== NICOMIDA (misma lógica que trabajamos, ahora con Firestore) ======
-
-  // Utilidades de fecha
-  const fmtISO = d=> d.toISOString().slice(0,10);
-  function startOfWeek(date){ const d=new Date(date); const day=(d.getDay()+6)%7; d.setDate(d.getDate()-day); d.setHours(0,0,0,0); return d; }
-  function addDays(date,n){ const d=new Date(date); d.setDate(d.getDate()+n); return d; }
-  function weekLabel(d){ const a=startOfWeek(d); const b=addDays(a,6); return `${fmtISO(a)} → ${fmtISO(b)}`; }
-
-  // Datos base
-  const DATA={
-    evitar:["tomate","miel"],
-    proteinas:[
-      {name:"pollo", tipo:"carne_blanca", rBase:35},
-      {name:"pavo", tipo:"carne_blanca", rBase:35},
-      {name:"ternera", tipo:"carne_roja", rBase:35},
-      {name:"cerdo magro", tipo:"carne_roja", rBase:35},
-      {name:"merluza", tipo:"pescado_blanco", rBase:30},
-      {name:"lenguado", tipo:"pescado_blanco", rBase:30},
-      {name:"bacalao fresco", tipo:"pescado_blanco", rBase:30},
-      {name:"salmón", tipo:"pescado_azul", rBase:30},
-      {name:"huevo", tipo:"huevo", rBase:50},
-      {name:"lentejas", tipo:"legumbre", rBase:40, factor:0.5},
-      {name:"garbanzos", tipo:"legumbre", rBase:40, factor:0.5},
-      {name:"alubias", tipo:"legumbre", rBase:40, factor:0.5}
-    ],
-    verduras:["calabacín","calabaza","zanahoria","batata","patata","judías verdes","brócoli","coliflor","guisantes","aguacate","pepino","pimiento rojo asado","remolacha cocida"],
-    carbs:[{name:"pasta",r:50},{name:"arroz",r:50},{name:"patata",r:110},{name:"batata",r:110},{name:"pan integral",r:30},{name:"quinoa",r:50},{name:"cuscús",r:50},{name:"sémola",r:50}],
-    frutas:["plátano","pera","manzana","arándanos","mandarina","melón","sandía","melocotón"]
+<!-- ===== PWA: manifest dinámico + service worker ligero ===== -->
+<script>
+  // Manifest mínimo en memoria (puedes moverlo a /manifest.webmanifest)
+  const manifest = {
+    name: "Nicomida – Modo Simple",
+    short_name: "Nicomida",
+    start_url: ".",
+    display: "standalone",
+    background_color: "#ffffff",
+    theme_color: "#A8E6CF",
+    icons: []
   };
+  const blob = new Blob([JSON.stringify(manifest)], {type: 'application/manifest+json'});
+  document.getElementById('app-manifest').setAttribute('href', URL.createObjectURL(blob));
 
-  // Persistencia en Firestore por semana (compartida entre usuarios autenticados)
-  function weekDocRef(mondayISO){ return doc(db, "familia", "shared", "weeks", mondayISO); }
-
-  // Entrada: { proteina:{name,tipo,r}, verduras:[..], carb:{name,r}, fruta, nota? }
-  function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
-
-  function suggestFor(dayISO, turno, weekData){
-    const freq={};
-    for(const d in weekData.entries||{}){ for(const t of ["comida","cena"]){
-      const e=weekData.entries[d]?.[t]; if(e?.proteina){ const tp=e.proteina.tipo; freq[tp]=(freq[tp]||0)+1; }
-    } }
-    const otherTurn= turno==="comida"?"cena":"comida";
-    const sameDay=weekData.entries?.[dayISO]?.[otherTurn];
-    const avoidTipo = sameDay?.proteina?.tipo || null;
-    const redCount = (freq["carne_roja"]||0);
-
-    let cands = DATA.proteinas.slice();
-    if(avoidTipo) cands=cands.filter(p=>p.tipo!==avoidTipo);
-
-    function score(p){
-      let s=10; const t=freq[p.tipo]||0;
-      if(p.tipo.startsWith("pescado")) s+= (t>=2? -6 : (2-t)*2);
-      if(p.tipo==="legumbre") s+= (t>=2? -4 : (2-t)*2);
-      if(p.tipo==="huevo") s+= (t>=3? -4 : (1<=t&&t<3? 1 : 2));
-      if(p.tipo==="carne_roja") s+= (redCount>=1? -8 : 0);
-      if(p.tipo==="carne_blanca") s+= (t>=4? -4 : 1);
-      return s + (Math.random()*2);
-    }
-    cands.sort((a,b)=>score(b)-score(a));
-    const prot = {...cands[0]};
-    prot.r = (turno==="comida" ? (prot.tipo==="legumbre"?40: prot.tipo==="huevo"?50:35)
-                               : (prot.tipo==="legumbre"?40: prot.tipo==="huevo"?50:25));
-    const v1 = pick(DATA.verduras);
-    let v2 = pick(DATA.verduras.filter(v=>v!==v1)); if(Math.random()<0.4) v2=null; const vSel = v2?[v1,v2]:[v1];
-    let carb = pick(DATA.carbs);
-    const vn=vSel.map(n=>n.toLowerCase());
-    if(vn.includes("patata") && carb.name==="patata") carb = pick(DATA.carbs.filter(c=>c.name!=="patata"));
-    if(vn.includes("batata") && carb.name==="batata") carb = pick(DATA.carbs.filter(c=>c.name!=="batata"));
-    const fruta = pick(DATA.frutas);
-    return { proteina:prot, verduras:vSel, carb, fruta };
+  // Service Worker inline via Blob (en producción usa /sw.js)
+  const swCode = `self.addEventListener('install', e=>{ self.skipWaiting(); e.waitUntil(caches.open('nicomida-v1').then(c=>c.addAll(['./'])));});
+self.addEventListener('activate', e=> self.clients.claim());
+self.addEventListener('fetch', e=>{ e.respondWith(caches.match(e.request).then(r=> r || fetch(e.request))); });`;
+  if('serviceWorker' in navigator){
+    const swBlob = new Blob([swCode], {type:'text/javascript'});
+    navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(console.warn);
   }
-
-  function weeklyProgress(entries){
-    const cnt={ pescado:0, huevo:0, legumbre:0, roja:0, blanca:0 };
-    for(const d in entries||{}){ for(const t of ["comida","cena"]){
-      const e=entries[d]?.[t]; if(!e?.proteina) continue; const tp=e.proteina.tipo;
-      if(tp.startsWith("pescado")) cnt.pescado++; else if(tp==="huevo") cnt.huevo++; else if(tp==="legumbre") cnt.legumbre++; else if(tp==="carne_roja") cnt.roja++; else if(tp==="carne_blanca") cnt.blanca++;
-    } }
-    const goals={ pescado:2, huevo:[1,3], legumbre:2, rojaMax:1, blanca:[2,4] };
-    let score=0, total=5;
-    if(cnt.pescado>=goals.pescado) score++;
-    if(cnt.huevo>=goals.huevo[0] && cnt.huevo<=goals.huevo[1]) score++;
-    if(cnt.legumbre>=goals.legumbre) score++;
-    if(cnt.roja<=goals.rojaMax) score++;
-    if(cnt.blanca>=goals.blanca[0] && cnt.blanca<=goals.blanca[1]) score++;
-    const pct=Math.round((score/total)*100);
-
-    const msgs=[];
-    if(cnt.pescado<2) msgs.push(`🐟 Falta pescado esta semana (${cnt.pescado}/2).`);
-    if(cnt.legumbre<2) msgs.push(`🌱 Pocas legumbres (${cnt.legumbre}/2).`);
-    if(cnt.huevo<1) msgs.push(`🥚 Añade 1 huevo en la semana.`);
-    if(cnt.roja>1) msgs.push(`🥩 Demasiada carne roja (${cnt.roja}/≤1).`);
-    if(cnt.blanca<2) msgs.push(`🍗 Sube carne blanca (actual ${cnt.blanca}).`);
-    return {cnt, pct, msgs};
-  }
-
-  function nutritionObservations(entries){
-    const days = Object.keys(entries||{}).sort();
-    const items=[]; const E=[];
-    for(const d of days){ for(const t of ["comida","cena"]){ const e=entries[d]?.[t]; if(!e) continue; E.push({d,t,e}); if(e.verduras) items.push(...e.verduras); if(e.carb) items.push(e.carb.name); } }
-    const good=[]; const warn=[];
-    const fruitCounts={}; let potatoLike=0; let veggieSet=new Set(); let fish=0, legumes=0;
-    for(const {e} of E){
-      if(e.carb?.name && ["patata","batata"].includes(e.carb.name)) potatoLike++;
-      if(e.fruta){ fruitCounts[e.fruta]=(fruitCounts[e.fruta]||0)+1; }
-      if(Array.isArray(e.verduras)) e.verduras.forEach(v=>veggieSet.add(v));
-      const tp=e.proteina?.tipo; if(tp){ if(tp.startsWith('pescado')) fish++; if(tp==='legumbre') legumes++; }
-    }
-    if(potatoLike>=3) warn.push({emj:'🥔', txt:'Mucha patata/boniato esta semana. Alterna con arroz, pasta, quinoa o pan para variar.'});
-    const last3 = E.slice(-3); if(last3.length===3){
-      const starchyNames = last3.map(x=>x.e.carb?.name||'');
-      const uniq = new Set(starchyNames.filter(Boolean));
-      const allStarchy = starchyNames.filter(n=>['patata','batata','arroz','pasta','pan integral','cuscús','sémola','quinoa'].includes(n)).length===3;
-      if(allStarchy && uniq.size<=2){ warn.push({emj:'⚖️', txt:'Mucho carbo repetido en las últimas comidas. Rota para un perfil más estable.'}); }
-    }
-    const blue = fruitCounts['arándanos']||0;
-    if(blue>=4) warn.push({emj:'🫐', txt:'Muchos arándanos esta semana. Rota con plátano/pera/manzana para variedad.'});
-    else if(blue>=1) good.push({emj:'🫐', txt:'Bien con los arándanos: antioxidantes y color. 👏'});
-    if(fish>=2) good.push({emj:'🐟', txt:'Buen aporte de pescado (omega-3, yodo).'});
-    else if(fish===0 && E.length>=4) warn.push({emj:'🐟', txt:'Aún sin pescado esta semana. Intenta incluir 1–2 raciones.'});
-    if(legumes>=2) good.push({emj:'🌱', txt:'Bien por incluir legumbres: fibra y proteína vegetal.'});
-    if(veggieSet.size>=5) good.push({emj:'🥦', txt:'Buena variedad de verduras (≥5 tipos).'});
-    return {good, warn};
-  }
-
-  // ======= UI refs =======
-  const dateEl=document.getElementById('date');
-  const turnoEl=document.getElementById('turno');
-  const weekGrid=document.getElementById('weekGrid');
-  const weekLabelEl=document.getElementById('weekLabel');
-  const estadoSemana=document.getElementById('estadoSemana');
-  const sugerenciaEl=document.getElementById('sugerencia');
-  const btnSugerirDia=document.getElementById('btnSugerirDia');
-  const btnPlanSemana=document.getElementById('btnPlanSemana');
-  const btnResumenPrev=document.getElementById('btnResumenPrev');
-  const btnConfirmar=document.getElementById('btnConfirmar');
-  const btnOtra=document.getElementById('btnOtra');
-  const inputManual=document.getElementById('inputManual');
-  const btnRegistrarManual=document.getElementById('btnRegistrarManual');
-  const scoreBar=document.getElementById('scoreBar');
-  const scoreMsg=document.getElementById('scoreMsg');
-  const resumenPrev=document.getElementById('resumenPrev');
-  const listaCompra=document.getElementById('listaCompra');
-  const testLog=document.getElementById('testLog');
-
-  // Estado actual en memoria
-  let currentMondayISO=null; let currentDayISO=null; let currentTurno='comida'; let cacheSug=null;
-  let unsubscribeWeek = null; // listener Firestore
-  let state = { weekStart:null, entries:{}, suggestions:{}, updatedAt:null }; // lo que viene de Firestore
-
-  function renderWeek(){
-    const base = startOfWeek(new Date(dateEl.value||new Date()));
-    const mondayISO = fmtISO(base);
-    currentMondayISO = mondayISO;
-    weekLabelEl.textContent = `(${weekLabel(base)})`;
-
-    const data = state.weekStart===mondayISO ? state : { weekStart:mondayISO, entries:{}, suggestions:{} };
-
-    const prog = weeklyProgress(data.entries);
-    scoreBar.style.width = prog.pct + '%';
-    scoreMsg.textContent = prog.msgs.length? prog.msgs.join(' ') : '✅ Buen equilibrio esta semana.';
-    const obs = nutritionObservations(data.entries);
-    const obsEl=document.getElementById('observaciones');
-    obsEl.innerHTML = [
-      ...obs.warn.map(o=>`<div class="item warn"><div class="emj">${o.emj}</div><div class="txt">${o.txt}</div></div>`),
-      ...obs.good.map(o=>`<div class="item good"><div class="emj">${o.emj}</div><div class="txt">${o.txt}</div></div>`)
-    ].join('') || '<div class="small">Sin observaciones por ahora. 👍</div>';
-
-    estadoSemana.textContent = `Semana ${weekLabel(base)} — proteína total diaria orientativa 40–60 g (comida/cena).`;
-
-    const cols=[];
-    for(let i=0;i<7;i++){
-      const d=fmtISO(addDays(base,i));
-      const pretty = new Date(d).toLocaleDateString('es-ES',{weekday:'short', day:'2-digit', month:'2-digit'});
-      const eC=data.entries?.[d]?.comida; const eN=data.entries?.[d]?.cena;
-      const sC=data.suggestions?.[d]?.comida; const sN=data.suggestions?.[d]?.cena;
-
-      cols.push(`<div class="daycol" data-day="${d}">
-        <div class="dayhdr"><b>${pretty}</b>
-          <div class="weekbar">
-            <span class="chip">${eC? '🍽️' : (sC?'📝':'—')} Comida</span>
-            <span class="chip">${eN? '🌙' : (sN?'📝':'—')} Cena</span>
-          </div>
-        </div>
-        ${renderEntry('Comida', eC, sC, d, 'comida')}
-        ${renderEntry('Cena',   eN, sN, d, 'cena')}
-        <div class="row" style="margin-top:8px">
-          <button data-act="sugC" data-day="${d}">Sugerir comida</button>
-          <button data-act="sugN" data-day="${d}">Sugerir cena</button>
-        </div>
-      </div>`);
-    }
-    weekGrid.innerHTML = cols.join('');
-
-    weekGrid.addEventListener('click', weekGrid._handler || (weekGrid._handler=(ev)=>{
-      const btn = ev.target.closest('button'); if(!btn) return;
-      const day = btn.getAttribute('data-day'); const act = btn.getAttribute('data-act');
-      if(act==='sugC' || act==='sugN'){
-        currentDayISO=day; currentTurno = (act==='sugC')?'comida':'cena';
-        const sug = suggestFor(day, currentTurno, state);
-        cacheSug=sug;
-        // Guardar sugerencia (roja) en Firestore
-        const newSug = structuredClone(state.suggestions||{});
-        newSug[day]=newSug[day]||{}; newSug[day][currentTurno]=sug;
-        saveWeek({ ...state, weekStart:mondayISO, suggestions:newSug });
-        sugerenciaEl.textContent = formatSug(day, currentTurno, sug);
-      }
-      if(act==='confirmHere'){
-        const turno = btn.getAttribute('data-turno');
-        const sug = state.suggestions?.[day]?.[turno]; if(!sug) return;
-        const newEntries = structuredClone(state.entries||{});
-        newEntries[day]=newEntries[day]||{}; newEntries[day][turno]=sug;
-        const newSug = structuredClone(state.suggestions||{});
-        delete newSug[day]?.[turno]; if(newSug[day] && !Object.keys(newSug[day]).length) delete newSug[day];
-        saveWeek({ ...state, weekStart:mondayISO, entries:newEntries, suggestions:newSug });
-      }
-      if(act==='discardSug'){
-        const turno = btn.getAttribute('data-turno');
-        const newSug = structuredClone(state.suggestions||{});
-        delete newSug[day]?.[turno]; if(newSug[day] && !Object.keys(newSug[day]).length) delete newSug[day];
-        saveWeek({ ...state, weekStart:mondayISO, suggestions:newSug });
-      }
-    }));
-  }
-
-  function renderEntry(label, e, sug, dayISO, turno){
-    if(!e && sug){
-      const pEq = sug.proteina?.factor? ` (≈${Math.round((sug.proteina.r||sug.proteina.rBase)*sug.proteina.factor)} g eq.)` : '';
-      return `<div class="card suggest small"><b>${label} · sugerencia</b><br>
-        Prot.: ${sug.proteina?.name||'-'} — ${(sug.proteina?.r||sug.proteina?.rBase||0)} g${pEq}<br>
-        Verd.: ${(sug.verduras||[]).join(' + ')||'-'}<br>
-        Carb.: ${sug.carb?.name||'-'} — ${(sug.carb?.r||0)} g<br>
-        Fruta: ${sug.fruta||'-'}
-        <div class="row" style="margin-top:6px">
-          <button data-act="confirmHere" data-day="${dayISO}" data-turno="${turno}" class="btn-primary">Confirmar aquí</button>
-          <button data-act="discardSug" data-day="${dayISO}" data-turno="${turno}" class="btn-danger">Descartar</button>
-        </div>
-      </div>`;
-    }
-    if(!e) return `<div class="card warn small">${label}: sin registro</div>`;
-    if(e.nota){
-      return `<div class="card ok small"><b>${label}</b><br>${e.nota}</div>`;
-    }
-    const pEq = e.proteina?.factor? ` (≈${Math.round((e.proteina.r||e.proteina.rBase)*e.proteina.factor)} g eq.)` : '';
-    return `<div class="card ok small"><b>${label}</b><br>
-      Prot.: ${e.proteina?.name||'-'} — ${(e.proteina?.r||e.proteina?.rBase||0)} g${pEq}<br>
-      Verd.: ${(e.verduras||[]).join(' + ')||'-'}<br>
-      Carb.: ${e.carb?.name||'-'} — ${(e.carb?.r||0)} g<br>
-      Fruta: ${e.fruta||'-'}
-    </div>`;
-  }
-
-  function formatSug(dayISO, turno, sug){
-    const nice = new Date(dayISO).toLocaleDateString('es-ES',{weekday:'long', day:'2-digit', month:'2-digit'});
-    const lines=[];
-    lines.push(`🗓️ ${nice} · ${turno==='comida'?'Comida':'Cena'}`);
-    lines.push(`• Proteína: ${sug.proteina.name} — ${sug.proteina.r} g` + (sug.proteina.factor? ` (≈${Math.round(sug.proteina.r*sug.proteina.factor)} g eq.)`:'' ));
-    lines.push(`• Verduras: ${sug.verduras.join(' + ')}`);
-    lines.push(`• Carbohidrato: ${sug.carb.name} — ${sug.carb.r} g`);
-    lines.push(`• Fruta (opcional): ${sug.fruta}`);
-    return lines.join('\n');
-  }
-
-  // Guardar semana en Firestore (merge)
-  async function saveWeek(newState){
-    const ref = weekDocRef(newState.weekStart);
-    const payload = { ...newState, updatedAt: serverTimestamp() };
-    await setDoc(ref, payload, { merge:true });
-  }
-
-  // Resumen semana anterior + lista de compra (derivado en cliente)
-  function summarizeWeek(entries){
-    const days = Object.keys(entries||{}).sort();
-    const items=[]; const cards=[];
-    for(const d of days){
-      for(const t of ["comida","cena"]){
-        const e=entries[d]?.[t]; if(!e) continue;
-        cards.push({d,t,e});
-        if(e.proteina?.name) items.push(e.proteina.name);
-        if(e.verduras) items.push(...e.verduras);
-        if(e.carb?.name) items.push(e.carb.name);
-      }
-    }
-    const tally={}; for(const it of items){ if(!it) continue; tally[it]=(tally[it]||0)+1; }
-    const list = Object.entries(tally).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`• ${k} ×${v}`);
-    return {cards, list};
-  }
-
-  // Handlers botones globales
-  btnSugerirDia.addEventListener('click', ()=>{
-    const base=startOfWeek(new Date(dateEl.value||new Date()));
-    const mondayISO=fmtISO(base);
-    const today=fmtISO(new Date());
-    const weekMon=fmtISO(base), weekSun=fmtISO(addDays(base,6));
-    const pickDay = (today>=weekMon && today<=weekSun) ? today : weekMon;
-    currentDayISO=pickDay; currentTurno=(turnoEl.value||'comida');
-    const sug=suggestFor(currentDayISO,currentTurno,state);
-    const newSug = structuredClone(state.suggestions||{});
-    newSug[currentDayISO]=newSug[currentDayISO]||{}; newSug[currentDayISO][currentTurno]=sug;
-    cacheSug=sug; sugerenciaEl.textContent = formatSug(currentDayISO,currentTurno,sug);
-    saveWeek({ ...state, weekStart:mondayISO, suggestions:newSug });
-  });
-
-  btnOtra.addEventListener('click', ()=>{
-    if(!currentDayISO){ sugerenciaEl.textContent='Elige una semana y pulsa "Sugerir" primero.'; return; }
-    const sug=suggestFor(currentDayISO,currentTurno,state);
-    const newSug = structuredClone(state.suggestions||{});
-    newSug[currentDayISO]=newSug[currentDayISO]||{}; newSug[currentDayISO][currentTurno]=sug;
-    cacheSug=sug; sugerenciaEl.textContent = formatSug(currentDayISO,currentTurno,sug);
-    saveWeek({ ...state, suggestions:newSug });
-  });
-
-  btnConfirmar.addEventListener('click', ()=>{
-    if(!cacheSug || !currentDayISO){ sugerenciaEl.textContent='No hay sugerencia que confirmar.'; return; }
-    const newEntries = structuredClone(state.entries||{});
-    newEntries[currentDayISO]=newEntries[currentDayISO]||{}; newEntries[currentDayISO][currentTurno]=cacheSug;
-    const newSug = structuredClone(state.suggestions||{});
-    delete newSug[currentDayISO]?.[currentTurno]; if(newSug[currentDayISO] && !Object.keys(newSug[currentDayISO]).length) delete newSug[currentDayISO];
-    saveWeek({ ...state, entries:newEntries, suggestions:newSug });
-    sugerenciaEl.textContent='✅ Guardado en la semana. Puedes seguir planificando.';
-  });
-
-  btnRegistrarManual.addEventListener('click', ()=>{
-    const txt = (inputManual.value||'').trim();
-    if(!txt || !currentDayISO){ sugerenciaEl.textContent='Escribe el texto y elige día/turno.'; return; }
-    const newEntries = structuredClone(state.entries||{});
-    newEntries[currentDayISO]=newEntries[currentDayISO]||{}; newEntries[currentDayISO][currentTurno] = { nota: txt };
-    const newSug = structuredClone(state.suggestions||{});
-    delete newSug[currentDayISO]?.[currentTurno]; if(newSug[currentDayISO] && !Object.keys(newSug[currentDayISO]).length) delete newSug[currentDayISO];
-    inputManual.value='';
-    saveWeek({ ...state, entries:newEntries, suggestions:newSug });
-    sugerenciaEl.textContent='✏️ Registrado lo que realmente comió.';
-  });
-
-  btnPlanSemana.addEventListener('click', ()=>{
-    const base = startOfWeek(new Date(dateEl.value||new Date()));
-    const mondayISO=fmtISO(base);
-    const data = structuredClone(state);
-    for(let i=0;i<7;i++){
-      const dISO=fmtISO(addDays(base,i));
-      for(const t of ['comida','cena']){
-        const sug=suggestFor(dISO, t, data);
-        data.suggestions=data.suggestions||{}; data.suggestions[dISO]=data.suggestions[dISO]||{}; data.suggestions[dISO][t]=sug;
-      }
-    }
-    saveWeek({ ...state, weekStart:mondayISO, suggestions:data.suggestions });
-    sugerenciaEl.textContent='🪐 Borrador semanal creado como sugerencias (rojo). Confirma día a día.';
-  });
-
-  btnResumenPrev.addEventListener('click', async ()=>{
-    const base = startOfWeek(new Date(dateEl.value||new Date()));
-    const prevMon = fmtISO(addDays(base,-7));
-    const snap = await getDoc(weekDocRef(prevMon));
-    const prev = snap.exists()? snap.data() : {entries:{}};
-    const {cards,list} = summarizeWeek(prev.entries||{});
-    if(cards.length===0){ resumenPrev.innerHTML = '<div class="card warn">No hay registros de la semana anterior.</div>'; listaCompra.style.display='none'; return; }
-    resumenPrev.innerHTML = cards.map(({d,t,e})=>{
-      const pretty = new Date(d).toLocaleDateString('es-ES',{weekday:'short', day:'2-digit', month:'2-digit'});
-      const text = e.nota? e.nota : `${e.proteina?.name||'-'} + ${(e.verduras||[]).join(' + ')||'-'} + ${e.carb?.name||'-'}`;
-      return `<div class="card small"><b>${pretty} · ${t==='comida'?'Comida':'Cena'}</b><br>${text}</div>`;
-    }).join('');
-    listaCompra.style.display='block';
-    listaCompra.innerHTML = `<b>🛒 Lista de la compra sugerida</b><br>${list.join('<br>')}`;
-  });
-
-  // Arranque cuando el usuario ya está autenticado
-  async function onLoginReady(){
-    const today=new Date();
-    dateEl.value = fmtISO(today);
-
-    // Suscripción en tiempo real a la semana visible
-    await switchWeek(fmtISO(startOfWeek(new Date(dateEl.value))));
-    dateEl.addEventListener('change', async ()=>{
-      await switchWeek(fmtISO(startOfWeek(new Date(dateEl.value))));
-    });
-
-    runSelfTests();
-  }
-
-  async function switchWeek(mondayISO){
-    if(unsubscribeWeek){ unsubscribeWeek(); unsubscribeWeek=null; }
-    const ref = weekDocRef(mondayISO);
-    // Si no existe, inicializa vacío (para evitar primer onSnapshot nulo)
-    const snap=await getDoc(ref);
-    if(!snap.exists()){
-      await setDoc(ref, { weekStart:mondayISO, entries:{}, suggestions:{}, updatedAt: serverTimestamp() }, { merge:true });
-    }
-    unsubscribeWeek = onSnapshot(ref, (docSnap)=>{
-      if(docSnap.exists()){
-        state = docSnap.data() || {weekStart:mondayISO, entries:{}, suggestions:{}};
-        renderWeek();
-      }
-    });
-  }
-
-  // Tests simples
-  function runSelfTests(){
-    const log=[]; const ok=(m)=>log.push('✅ '+m); const fail=(m)=>log.push('❌ '+m);
-    try{ const mon = startOfWeek(new Date('2025-08-14')); if(mon.getDay()===1) ok('startOfWeek fija lunes correctamente'); else fail('startOfWeek no cae en lunes'); }catch(e){ fail('startOfWeek error: '+e.message); }
-    try{ const sug = suggestFor(fmtISO(startOfWeek(new Date())),'comida',{entries:{}}); if(sug && sug.proteina && sug.carb && Array.isArray(sug.verduras)) ok('suggestFor válido'); else fail('suggestFor inválido'); }catch(e){ fail('suggestFor error: '+e.message); }
-    testLog.textContent = log.join('\n');
-  }
-
 </script>
 </body>
 </html>
