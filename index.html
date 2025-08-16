@@ -3,53 +3,71 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Nicomida – Modo Simple (v4.4)</title>
+<title>Nicomida – Modo Simple (v5)</title>
+<!-- Intento de cargar tu antiguo archivo de configuración si existe en el repo -->
+<script src="firebase-config.js" defer></script>
 <style>
-  :root{--bg:#f6fbff;--card:#ffffff;--ink:#0b1324;--muted:#64748b;--line:#e5e7eb;--brand:#10b981;--brand2:#22d3ee}
+  :root{
+    --bg:#f7fbff; --card:#ffffff; --ink:#0b1324; --muted:#64748b; --line:#e5e7eb;
+    --brand:#7dd3fc; /* cielo pastel */
+    --brand-strong:#38bdf8;
+    --accent:#f0abfc; /* lila pastel */
+    --accent-strong:#e879f9;
+    --ok:#86efac; --warn:#fde68a; --bad:#fecaca;
+  }
   *{box-sizing:border-box}
   html,body{margin:0;height:100%;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial}
-  body{background:radial-gradient(1200px 800px at 10% -10%, #e9fbf3 0, transparent 40%),radial-gradient(1000px 700px at 110% -10%, #e6faff 0, transparent 40%),var(--bg);color:var(--ink)}
-  header{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.9);backdrop-filter:saturate(120%) blur(8px);border-bottom:1px solid var(--line)}
-  .wrap{max-width:1100px;margin:0 auto;padding:8px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+  body{background:
+    radial-gradient(1100px 700px at -10% -10%, #e6faff 0, transparent 40%),
+    radial-gradient(900px 600px at 110% -10%, #fce7f3 0, transparent 40%),
+    var(--bg); color:var(--ink)}
+  header{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.85);backdrop-filter:saturate(120%) blur(8px);border-bottom:1px solid var(--line)}
+  .wrap{max-width:1100px;margin:0 auto;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px}
   h1{margin:0;font-size:20px;display:flex;align-items:center;gap:10px}
-  .badge{font-size:12px;padding:4px 8px;border-radius:999px;background:#eafff5;color:#065f46;border:1px solid #a7f3d0}
+  .badge{font-size:12px;padding:4px 8px;border-radius:999px;background:#e0f2fe;color:#0c4a6e;border:1px solid #bae6fd}
   nav{display:flex;gap:8px;padding:8px 14px}
-  nav button{flex:1;padding:10px 12px;border:1px solid var(--line);background:#fff;border-radius:14px;cursor:pointer;color:var(--muted);font-weight:600}
-  nav button.active{background:#eafff5;border-color:#a7f3d0;color:#065f46}
+  nav button{flex:1;padding:10px 12px;border:1px solid var(--line);background:#fff;border-radius:14px;cursor:pointer;color:var(--muted);font-weight:700}
+  nav button.active{background:#e0f2fe;border-color:#bae6fd;color:#0c4a6e}
   #login-bar{font-size:13px;color:#334155}
-  #login-bar button{border:1px solid var(--line);border-radius:999px;padding:6px 10px;background:#fff;cursor:pointer}
+  #login-bar input{border:1px solid var(--line);border-radius:999px;padding:6px 10px;margin-right:6px}
+  #login-bar .btn{border:1px solid var(--line);border-radius:999px;padding:6px 10px;background:#fff;cursor:pointer}
   main{max-width:1100px;margin:0 auto;padding:14px}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 6px 24px rgba(16,185,129,.07)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 8px 28px rgba(168,85,247,.08)}
   .row{display:flex;gap:12px;flex-wrap:wrap}
   .col{flex:1 1 280px}
   label{font-size:12px;color:var(--muted)}
   input,select,textarea,button{border-radius:12px;border:1px solid var(--line);background:#fff;color:var(--ink);padding:10px;font-size:14px}
   input,select,textarea{width:100%}
-  .btn{background:#f9fafb}
-  .btn.primary{background:var(--brand);border-color:#059669;color:#06290f;font-weight:700}
-  .btn.alt{background:var(--brand2);border-color:#0891b2;color:#05222a;font-weight:700}
+  button{cursor:pointer}
+  .btn{background:#f8fafc}
+  .btn.primary{background:var(--brand);border-color:var(--brand-strong);color:#062a36;font-weight:800}
+  .btn.alt{background:var(--accent);border-color:var(--accent-strong);color:#3b1140;font-weight:800}
   .suggestion{border:1px solid var(--line);border-radius:14px;padding:10px;margin:8px 0;display:flex;justify-content:space-between;gap:12px;background:#fcfdfd}
   .list-item{display:flex;justify-content:space-between;align-items:center;border:1px dashed var(--line);border-radius:12px;padding:8px;margin:6px 0;background:#fff}
-  .section-title{font-weight:800;margin:12px 0 6px}
+  .section-title{font-weight:900;margin:12px 0 6px}
   .small{font-size:12px;color:var(--muted)}
   .hidden{display:none}
-  .meter{position:relative;height:16px;border-radius:999px;background:linear-gradient(90deg,#fecaca,#fde68a,#bbf7d0);border:1px solid var(--line)}
+  /* Acelerómetro */
+  .meter{position:relative;height:16px;border-radius:999px;background:linear-gradient(90deg,var(--bad),var(--warn),var(--ok));border:1px solid var(--line)}
   .needle{position:absolute;top:-6px;transform:translateX(-50%);height:28px;width:2px;background:#111;border-radius:2px}
   .meter-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--muted)}
   .proscons{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px}
   .proscons .box{border:1px solid var(--line);border-radius:12px;padding:10px;background:#fff}
   .proscons ul{margin:6px 0 0 18px;padding:0}
+  /* Otras tomas: vertical y uniforme */
   .stack{display:flex;flex-direction:column;gap:10px}
   .stack .entry{display:flex;flex-direction:column;gap:6px}
   .stack .row-save{display:flex;gap:8px}
   .stack .row-save input{flex:1}
   .stack .row-save button{width:44px}
+  /* Plan semanal */
   .plan-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
   .slot{border:1px solid var(--line);border-radius:14px;padding:8px;background:#fff}
   .slot.pending{outline:2px dashed #fca5a5;background:#fff5f5}
   .slot.confirmed{outline:2px solid #bbf7d0;background:#f0fdf4}
   .slot .actions{display:flex;gap:6px;margin-top:6px}
   .slot .actions .icon{padding:6px 10px;border:1px solid var(--line);border-radius:12px;background:#f3f4f6;cursor:pointer}
+  /* Autotests */
   details.tests{margin:12px 0}
   details.tests summary{cursor:pointer}
   .pass{color:#16a34a}.fail{color:#b91c1c}
@@ -58,7 +76,7 @@
 <body>
 <header>
   <div class="wrap">
-    <h1>🍽️ Nicomida – Modo Simple <span class="badge">v4.4</span></h1>
+    <h1>🍽️ Nicomida – Modo Simple <span class="badge">v5</span></h1>
     <div id="login-bar">Cargando sesión…</div>
   </div>
   <nav class="wrap">
@@ -69,6 +87,7 @@
 </header>
 
 <main>
+  <!-- HOY -->
   <section id="hoy" class="card">
     <div class="row">
       <div class="col">
@@ -118,6 +137,7 @@
     <div id="hoy-historial"></div>
   </section>
 
+  <!-- PLAN -->
   <section id="plan" class="card hidden">
     <div class="small">Rellena ideas (rojo = pendiente). Confirma (verde) o 🔄 regenera por comida. Puedes <b>editar a mano</b> cada casilla.</div>
     <div class="row" style="margin-top:8px">
@@ -128,6 +148,7 @@
     <div class="small" id="plan-msg"></div>
   </section>
 
+  <!-- LISTA -->
   <section id="lista" class="card hidden">
     <div class="row" style="margin-top:8px">
       <div class="col"><label>Desde</label><input type="date" id="list-from" /></div>
@@ -137,6 +158,7 @@
     <div id="lista-contenido" style="margin-top:10px"></div>
   </section>
 
+  <!-- AUTOTESTS -->
   <details class="tests card" style="margin-top:10px">
     <summary>🔧 Autotests (diagnóstico rápido)</summary>
     <ul id="test-results" class="small"></ul>
@@ -150,28 +172,21 @@ const todayStr=()=> new Date().toISOString().slice(0,10);
 const weekDays=["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"];
 const mealLabels={desayuno:"Desayuno", snack_am:"Snack mañana", comida:"Comida", merienda:"Merienda", cena:"Cena"};
 
-// ===== Estado
-const KEY='nicomida_v33';
+// ===== Estado (robusto frente a JSON corrupto)
+const KEY='nicomida_v5';
 let state=load();
-function load() {
-  try {
-    const raw = localStorage.getItem(KEY);
-    // Si hay basura en localStorage, intenta repararla borrando la clave
-    if (!raw) return { logs: {}, plans: {} };
-    const parsed = JSON.parse(raw);
-    if (parsed && typeof parsed === 'object' && 'logs' in parsed && 'plans' in parsed) return parsed;
-    // Si no es el formato esperado, reset
-    localStorage.removeItem(KEY);
-    return { logs: {}, plans: {} };
-  } catch (e) {
-    // Si el JSON está corrupto (Unexpected token , etc.), resetea
-    try { localStorage.removeItem(KEY); } catch(_) {}
-    return { logs: {}, plans: {} };
-  }
+function load(){
+  try{
+    const raw=localStorage.getItem(KEY);
+    if(!raw) return {logs:{},plans:{}};
+    const obj=JSON.parse(raw);
+    if(obj && typeof obj==='object' && 'logs' in obj && 'plans' in obj) return obj;
+    localStorage.removeItem(KEY); return {logs:{},plans:{}};
+  }catch(e){ try{localStorage.removeItem(KEY);}catch(_){} return {logs:{},plans:{}}; }
 }
 function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
 
-// ===== Léxico / categorías
+// ===== Reglas / léxico
 const PROH={ ingredientes:["tomate","remolacha"], nocturnos:["brócoli","brocoli"], maxEggs:5, maxLentejas:1, maxRedMeat:1 };
 const LEX={
   'aceite de oliva':{norm:'aceite de oliva', cats:['grasa']}, 'aceite':{norm:'aceite de oliva', cats:['grasa']},
@@ -190,7 +205,7 @@ const MULTI=Object.keys(LEX).filter(k=>k.includes(' ')).sort((a,b)=>b.length-a.l
 function toAsciiLower(s){ const map={"á":"a","é":"e","í":"i","ó":"o","ú":"u","ü":"u","ñ":"n"}; return s.toLowerCase().split('').map(ch=>map[ch]||ch).join(''); }
 function parseFree(text){ const original=text.trim(); if(!original) return null; let t=' '+toAsciiLower(original)+' '; const found=new Set(), cats=new Set(); MULTI.forEach(ph=>{ const p=' '+toAsciiLower(ph)+' '; if(t.includes(p)){ found.add(LEX[ph].norm); LEX[ph].cats.forEach(c=>cats.add(c)); t=t.split(p).join(' ');} }); t.split(/,| y | con | de |\+/g).map(s=>s.trim()).filter(Boolean).forEach(tok=>{ tok=tok.replace(/\b\d+[\wªº]*\b/g,'').trim(); if(!tok) return; const k=LEX[tok]?tok:(tok.endsWith('s')?tok.slice(0,-1):tok); if(LEX[k]){ found.add(LEX[k].norm); LEX[k].cats.forEach(c=>cats.add(c)); } }); [...found].forEach(i=>{ if(PROH.ingredientes.includes(i)) found.delete(i); }); return {dish:original, ingredients:[...found], categories:[...cats], ts:Date.now()}; }
 
-// ===== Ideas
+// ===== Ideas (siempre P+C+V)
 const BANK={ base:[
   {title:"Pollo con arroz y calabacín", ing:['pollo','arroz','calabacín','aceite de oliva']},
   {title:"Pavo con boniato y zanahoria", ing:['pavo','boniato','zanahoria','aceite de oliva']},
@@ -204,52 +219,81 @@ const BANK={ base:[
 function ingCats(ing){ const cats=new Set(); (ing||[]).forEach(i=> (LEX[i]?.cats||[]).forEach(c=>cats.add(c))); return cats; }
 function isBalanced(ing){ const cats=ingCats(ing); return cats.has('proteína') && (cats.has('cereal')||cats.has('tubérculo')) && cats.has('verdura'); }
 
+// ===== Contexto día/semana
 function weekStartOf(dateStr){ const d=new Date(dateStr); const day=(d.getUTCDay()+6)%7; d.setUTCDate(d.getUTCDate()-day); return d.toISOString().slice(0,10); }
 function inWeekRange(dateStr, weekStart){ const d=new Date(dateStr); const w=new Date(weekStart); const diff=(d-w)/86400000; return diff>=0 && diff<7; }
 function countersWeek(weekStart){ let eggs=0,lent=0,red=0; for(const d in state.logs){ if(inWeekRange(d,weekStart)){ const day=state.logs[d]; Object.values(day).forEach(e=>{ const ing=e?.ingredients||[]; if(ing.includes('huevo')) eggs++; if(ing.includes('lentejas')) lent++; if(ing.includes('ternera')) red++; }); } } return {eggs,lent,red}; }
 
+// ===== allowedFor (string o array)
 function allowedFor(turno, x){ let tlist=[]; if(Array.isArray(x)) tlist=x; else if(typeof x==='string'){ const low=x.toLowerCase(); if(low.includes('tomate')||low.includes('remolacha')) return false; if(turno==='cena' && (low.includes('brócoli')||low.includes('brocoli'))) return false; return true; } tlist=(tlist||[]).map(s=> (''+s).toLowerCase()); if(tlist.some(s=> PROH.ingredientes.includes(s))) return false; if(turno==='cena' && (tlist.includes('brócoli')||tlist.includes('brocoli'))) return false; return true; }
 
-function preferByContext(turno,dateStr,weekStart,cand){ const today=state.logs[dateStr]||{}; const dayCats=new Set(); Object.values(today).forEach(e=> (e?.ingredients||[]).forEach(i=> (LEX[i]?.cats||[]).forEach(c=>dayCats.add(c)))); const w=countersWeek(weekStart); return cand.filter(item=>{ const cats=ingCats(item.ing); if(item.ing.includes('huevo') && w.eggs>=PROH.maxEggs) return false; if(item.ing.includes('lentejas') && w.lent>=PROH.maxLentejas) return false; if(item.ing.includes('ternera') && w.red>=PROH.maxRedMeat) return false; if(dayCats.has('carne_blanca')||dayCats.has('carne_roja')){ if(cats.has('carne_blanca')||cats.has('carne_roja')) return false; } if(turno==='cena' && (cats.has('carne_blanca')||cats.has('carne_roja'))) return false; return true; }); }
+// ===== Generador consciente de contexto
+function preferByContext(turno,dateStr,weekStart,cand){
+  const today=state.logs[dateStr]||{}; const dayCats=new Set(); Object.values(today).forEach(e=> (e?.ingredients||[]).forEach(i=> (LEX[i]?.cats||[]).forEach(c=>dayCats.add(c))));
+  const w=countersWeek(weekStart);
+  return cand.filter(item=>{
+    const cats=ingCats(item.ing);
+    if(item.ing.includes('huevo') && w.eggs>=PROH.maxEggs) return false;
+    if(item.ing.includes('lentejas') && w.lent>=PROH.maxLentejas) return false;
+    if(item.ing.includes('ternera') && w.red>=PROH.maxRedMeat) return false;
+    if(dayCats.has('carne_blanca')||dayCats.has('carne_roja')){
+      if(cats.has('carne_blanca')||cats.has('carne_roja')) return false;
+    }
+    if(turno==='cena' && (cats.has('carne_blanca')||cats.has('carne_roja'))) return false;
+    return true;
+  });
+}
 function candidates(turno,dateStr){ const ws=weekStartOf(dateStr); let cand=[...BANK.base].map(x=>({title:x.title, ing:[...x.ing]})); cand=cand.filter(x=> isBalanced(x.ing) && allowedFor(turno,x.ing)); let filtered=preferByContext(turno,dateStr,ws,cand); if(!filtered.length) filtered=cand; return filtered; }
 function pickIdea(turno,dateStr){ const list=candidates(turno,dateStr); return list[Math.floor(Math.random()*list.length)]; }
 
+// ===== Registro / historial
 function addLog(date,turno,entry){ if(!state.logs[date]) state.logs[date]={}; state.logs[date][turno]=entry; save(); }
 function renderDayHistory(date){ const box=$('#hoy-historial'); box.innerHTML=''; const day=state.logs[date]||{}; ['desayuno','snack_am','comida','merienda','cena'].forEach(t=>{ if(day[t]){ const it=day[t]; const el=document.createElement('div'); el.className='list-item'; el.innerHTML=`<div><div><b>${mealLabels[t]}</b>: ${it.dish||''}</div><div class="small">${(it.ingredients||[]).join(', ')}</div></div><button class="btn">Eliminar</button>`; el.querySelector('button').onclick=()=>{ delete day[t]; save(); renderDayHistory(date); updateMeter(); }; box.appendChild(el); } }); updateMeter(); }
 
-function renderHoySuggestions(){ const turno=$('#hoy-turno').value; const date=$('#hoy-date').value; const list=$('#hoy-sug-list'); list.innerHTML=''; const ids=new Set(); for(let i=0;i<6 && ids.size<4;i++){ const it=pickIdea(turno,date); if(!it||ids.has(it.title)) continue; ids.add(it.title); const el=document.createElement('div'); el.className='suggestion'; el.innerHTML=`<div><div style="font-weight:700">${it.title}</div><div class="small">${it.ing.join(', ')}</div></div><div style="display:flex;gap:8px;align-items:center"><button class="btn alt">Planear</button><button class="btn primary">Registrar</button></div>`; const [planBtn,regBtn]=el.querySelectorAll('button'); planBtn.onclick=()=> quickPlanFromSuggestionStruct(it); regBtn.onclick=()=>{ const date=$('#hoy-date').value; const turno=$('#hoy-turno').value; const cats=ingCats(it.ing); addLog(date, turno, {dish:it.title, ingredients:it.ing, categories:[...cats], ts:Date.now()}); renderDayHistory(date); }; list.appendChild(el); } }
+// ===== Sugerencias (HOY)
+function renderHoySuggestions(){ const turno=$('#hoy-turno').value; const date=$('#hoy-date').value; const list=$('#hoy-sug-list'); list.innerHTML=''; const ids=new Set(); for(let i=0;i<6 && ids.size<4;i++){ const it=pickIdea(turno,date); if(!it||ids.has(it.title)) continue; ids.add(it.title); const el=document.createElement('div'); el.className='suggestion'; el.innerHTML=`<div><div style="font-weight:800">${it.title}</div><div class="small">${it.ing.join(', ')}</div></div><div style="display:flex;gap:8px;align-items:center"><button class="btn alt">Planear</button><button class="btn primary">Registrar</button></div>`; const [planBtn,regBtn]=el.querySelectorAll('button'); planBtn.onclick=()=> quickPlanFromSuggestionStruct(it); regBtn.onclick=()=>{ const date=$('#hoy-date').value; const turno=$('#hoy-turno').value; const cats=ingCats(it.ing); addLog(date, turno, {dish:it.title, ingredients:it.ing, categories:[...cats], ts:Date.now()}); renderDayHistory(date); }; list.appendChild(el); } }
 
+// ===== Acelerómetro + pros/cons
 function mealCompleteness(e){ if(!e) return 0; const cats=new Set(e.categories||[]); let s=0; if(cats.has('proteína')) s+=0.4; if(cats.has('cereal')||cats.has('tubérculo')) s+=0.3; if(cats.has('verdura')) s+=0.3; return s; }
 function updateMeter(){ const date=$('#hoy-date').value; const day=state.logs[date]||{}; const pros=[], cons=[]; const scMeal=mealCompleteness(day.comida); const scDinner=mealCompleteness(day.cena); if(scMeal===1) pros.push('Comida completa (P+C+V)'); else cons.push('Completar la comida con P+C+V'); if(scDinner===1) pros.push('Cena completa (P+C+V)'); else cons.push('Completar la cena con P+C+V'); const catsDay=new Set(); Object.values(day).forEach(e=> (e?.categories||[]).forEach(c=>catsDay.add(c)) ); if(catsDay.has('fruta')) pros.push('Incluiste fruta'); else cons.push('Añadir fruta en alguna toma'); if(catsDay.has('grasa')||catsDay.has('grasa saludable')) pros.push('Grasa saludable presente'); let score=(scMeal+scDinner)*5; const w=countersWeek(weekStartOf(date)); if(w.eggs>PROH.maxEggs){ score-=1; cons.push('Huevo >5/sem'); } if(w.lent>PROH.maxLentejas){ score-=0.5; cons.push('Lentejas >1/sem'); } if(w.red>PROH.maxRedMeat){ score-=0.5; cons.push('Carne roja >1/sem'); } if(day.cena && (day.cena.ingredients||[]).includes('brócoli')){ score-=0.8; cons.push('Evitar brócoli por la noche'); } score=Math.max(0,Math.min(10,Math.round(score*2)/2)); $('#needle').style.left=(score*10)+'%'; $('#pros-list').innerHTML=pros.map(x=>`<li>${x}</li>`).join(''); $('#cons-list').innerHTML=cons.filter((v,i,a)=>a.indexOf(v)===i).map(x=>`<li>${x}</li>`).join(''); }
 
+// ===== Plan semanal editable
 function ensurePlan(ws){ if(!state.plans[ws]) state.plans[ws]=Array.from({length:7},()=>({comida:{},cena:{}})); }
 function renderPlan(){ const grid=$('#plan-grid'); const ws=$('#week-start').value; ensurePlan(ws); grid.innerHTML=''; const week=state.plans[ws]; week.forEach((day,idx)=>{ const card=document.createElement('div'); card.className='card'; const date=new Date(ws); date.setUTCDate(date.getUTCDate()+idx); const ds=date.toISOString().slice(0,10);
   const slot=(t)=>{ const s=day[t]||{}; const st=s.confirmed?'confirmed':'pending'; return `<div class="slot ${st}" data-idx="${idx}" data-t="${t}"><div class="small"><b>${t==='comida'?'Comida':'Cena'}</b> <span class="small" style="opacity:.7">${ds}</span></div><input class="inp" value="${s.title||''}" placeholder="Idea de ${t}" /><div class="actions"><span class="icon regen" title="Regenerar">🔄</span><span class="icon confirm" title="Confirmar">✅</span></div></div>`; };
-  card.innerHTML=`<div style="font-weight:700;margin-bottom:6px">${weekDays[idx]}</div><div class="plan-grid">${slot('comida')}${slot('cena')}</div>`; grid.appendChild(card); });
+  card.innerHTML=`<div style="font-weight:800;margin-bottom:6px">${weekDays[idx]}</div><div class="plan-grid">${slot('comida')}${slot('cena')}</div>`; grid.appendChild(card); });
   $$('#plan-grid .slot').forEach(sl=>{ const idx=+sl.dataset.idx; const t=sl.dataset.t; const inp=sl.querySelector('.inp'); inp.oninput=e=>{ const ws=$('#week-start').value; const val=e.target.value; const parsed=parseFree(val)||{}; state.plans[ws][idx][t].title=val; state.plans[ws][idx][t].ing=parsed.ingredients||[]; state.plans[ws][idx][t].categories=parsed.categories||[]; save(); }; sl.querySelector('.regen').onclick=()=>{ const ws=$('#week-start').value; const date=new Date(ws); date.setUTCDate(date.getUTCDate()+idx); const ds=date.toISOString().slice(0,10); const idea=pickIdea(t, ds); state.plans[ws][idx][t]={title:idea.title, ing:idea.ing, categories:[...ingCats(idea.ing)], confirmed:false}; save(); renderPlan(); }; sl.querySelector('.confirm').onclick=()=>{ const ws=$('#week-start').value; const s=state.plans[ws][idx][t]; if(!s?.title) return alert('Escribe o genera una idea'); let ing=s.ing && s.ing.length? s.ing : (parseFree(s.title)||{}).ingredients || []; if(!isBalanced(ing)){ const cats=ingCats(ing); if(!(cats.has('cereal')||cats.has('tubérculo'))) ing.push('arroz'); if(!cats.has('verdura')) ing.push('calabacín'); if(!cats.has('proteína')) ing.push('pollo'); } s.ing=ing; s.categories=[...ingCats(ing)]; s.confirmed=true; save(); renderPlan(); }; }); }
 
 function autoPlan(){ const ws=$('#week-start').value; ensurePlan(ws); for(let i=0;i<7;i++){ const d=new Date(ws); d.setUTCDate(d.getUTCDate()+i); const ds=d.toISOString().slice(0,10); const c=pickIdea('comida',ds); const z=pickIdea('cena',ds); state.plans[ws][i].comida={title:c.title, ing:c.ing, categories:[...ingCats(c.ing)], confirmed:false}; state.plans[ws][i].cena={title:z.title, ing:z.ing, categories:[...ingCats(z.ing)], confirmed:false}; } save(); renderPlan(); }
 
 function quickPlanFromSuggestionStruct(item){ const ws=$('#week-start').value||weekStartOf($('#hoy-date').value); ensurePlan(ws); const a=new Date(ws), b=new Date($('#hoy-date').value); const idx=Math.round((b-a)/86400000); if(idx<0||idx>6) return alert('La fecha no está en la semana seleccionada'); const t=$('#hoy-turno').value; if(!allowedFor(t,item.ing)) return alert('Sugerencia incompatible con tus reglas'); state.plans[ws][idx][t]={title:item.title, ing:item.ing, categories:[...ingCats(item.ing)], confirmed:false}; save(); renderPlan(); }
 
+// ===== Lista de la compra
 function generateList(){ const from=$('#list-from').value, to=$('#list-to').value; const items=new Set(); for(const date in state.logs){ if(date>=from&&date<=to){ Object.values(state.logs[date]).forEach(e=> (e.ingredients||[]).forEach(i=> items.add(i))); }} const ws=weekStartOf(from); (state.plans[ws]||[]).forEach((d,di)=>{ const dayDate=new Date(ws); dayDate.setUTCDate(dayDate.getUTCDate()+di); const ds=dayDate.toISOString().slice(0,10); if(ds>=from&&ds<=to){ ['comida','cena'].forEach(t=>{ const s=d[t]; if(s?.confirmed) (s.ing|| (parseFree(s.title)||{}).ingredients || []).forEach(i=> items.add(i)); }); } }); PROH.ingredientes.forEach(p=> items.delete(p)); const cont=$('#lista-contenido'); const arr=[...items].sort(); cont.innerHTML= arr.length? arr.map(i=>`<div class="list-item"><span>${i}</span><button class="btn">✔️</button></div>`).join(''): '<div class="small">No hay ingredientes en el rango.</div>'; }
 function copyList(){ const items=[...$('#lista-contenido').querySelectorAll('.list-item span')].map(el=>el.textContent); navigator.clipboard.writeText(items.join('\n')).then(()=>alert('Lista copiada ✅')); }
 
+// ===== Tabs & init
 function setTab(id){ ['hoy','plan','lista'].forEach(x=> $('#'+x).classList.toggle('hidden', x!==id)); $$('nav button').forEach(b=> b.classList.toggle('active', b.dataset.tab===id)); }
 $$('nav button').forEach(b=> b.onclick=()=> setTab(b.dataset.tab));
 
 function init(){ $('#hoy-date').value=todayStr(); $('#week-start').value=weekStartOf(todayStr()); $('#list-from').value=weekStartOf(todayStr()); const to=new Date($('#list-from').value); to.setUTCDate(to.getUTCDate()+6); $('#list-to').value=to.toISOString().slice(0,10); $('#label-turno').textContent=$('#hoy-turno').selectedOptions[0].textContent; renderHoySuggestions(); renderDayHistory($('#hoy-date').value); renderPlan(); }
 
+// Eventos HOY
 $('#btn-hoy-sugerir').onclick=renderHoySuggestions; $('#hoy-turno').onchange=()=> $('#label-turno').textContent=$('#hoy-turno').selectedOptions[0].textContent; $('#btn-parse-alt').onclick=()=>{ const s=$('#alt-plato').value.trim(); if(!s) return alert('Escribe la alternativa'); const e=parseFree(s); const date=$('#hoy-date').value; const turno=$('#hoy-turno').value; addLog(date, turno, e); $('#alt-plato').value=''; renderDayHistory(date); };
 $('#save-des').onclick=()=>{ const v=$('#txt-desayuno').value.trim(); if(!v) return; const d=$('#hoy-date').value; addLog(d,'desayuno',parseFree(v)); $('#txt-desayuno').value=''; renderDayHistory(d); };
 $('#save-snack').onclick=()=>{ const v=$('#txt-snack').value.trim(); if(!v) return; const d=$('#hoy-date').value; addLog(d,'snack_am',parseFree(v)); $('#txt-snack').value=''; renderDayHistory(d); };
 $('#save-mer').onclick=()=>{ const v=$('#txt-merienda').value.trim(); if(!v) return; const d=$('#hoy-date').value; addLog(d,'merienda',parseFree(v)); $('#txt-merienda').value=''; renderDayHistory(d); };
 $('#hoy-date').onchange=()=> renderDayHistory($('#hoy-date').value);
+
+// Plan
 $('#btn-auto-plan').onclick=autoPlan; $('#btn-guardar-plan').onclick=()=>{ save(); alert('Plan guardado ✅'); }; $('#week-start').onchange=renderPlan;
+
+// Lista
 $('#btn-generar-lista').onclick=generateList; $('#btn-copiar-lista').onclick=copyList;
 
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', init); else init();
 
+// ===== Autotests =====
 function runTests(){ const results=[]; const ok=(name,cond)=>results.push({name,pass:!!cond});
   try{
     const p1=parseFree('leche con avena y kiwi'); ok('parser: leche/avena/kiwi', p1 && ['leche','avena','kiwi'].every(x=>p1.ingredients.includes(x)));
@@ -272,19 +316,19 @@ function runTests(){ const results=[]; const ok=(name,cond)=>results.push({name,
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', runTests); else runTests();
 </script>
 
-<!-- ===== Login auto-compatible (v8/v9/v10) SIN tocar tu Firebase ===== -->
+<!-- ===== Login auto: v8 (namespace) o v9/v10 (modular) con email/contraseña; si no hay config → local ===== -->
 <script>
 (function(){
   const bar = document.getElementById('login-bar');
   function showAnon(){ bar.innerHTML = '<span style="color:#64748b">Modo sin login</span>'; }
-  function showUser(name){ bar.innerHTML = '👋 '+name+' · <button id="btn-out">Salir</button>'; document.getElementById('btn-out').onclick = ()=>{ if(window.firebase?.auth){ return window.firebase.auth().signOut(); } if(window._authV9){ return window._authV9.signOut(); } }; }
+  function showUser(name){ bar.innerHTML = '👋 '+name+' · <button class="btn" id="btn-out">Salir</button>'; document.getElementById('btn-out').onclick = ()=>{ if(window.firebase?.auth){ return window.firebase.auth().signOut(); } if(window._authV9){ return window._authV9.signOut(); } }; }
   function showSignin(onSubmit){
-    bar.innerHTML = '<form id="login-form" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">'+
-      '<input id="auth-email" type="email" placeholder="email" style="padding:6px 8px;border:1px solid #e5e7eb;border-radius:999px">'+
-      '<input id="auth-pass" type="password" placeholder="contraseña" style="padding:6px 8px;border:1px solid #e5e7eb;border-radius:999px">'+
-      '<button type="submit">Entrar</button>'+
-      '<button type="button" id="btn-reg">Crear</button>'+
-    '</form>';
+    bar.innerHTML = '<form id="login-form" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">'
+      +'<input id="auth-email" type="email" placeholder="email">'
+      +'<input id="auth-pass" type="password" placeholder="contraseña">'
+      +'<button class="btn" type="submit">Entrar</button>'
+      +'<button class="btn" type="button" id="btn-reg">Crear</button>'
+      +'</form>';
     const f=document.getElementById('login-form');
     const reg=document.getElementById('btn-reg');
     f.onsubmit=(e)=>{ e.preventDefault(); const email=document.getElementById('auth-email').value.trim(); const pass=document.getElementById('auth-pass').value; onSubmit('signin', email, pass); };
@@ -306,7 +350,6 @@ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded'
       });
       return; // listo v8
     }catch(e){ console.warn('Auth v8 detectado pero falló:', e); }
-  }catch(e){ console.warn('Auth v8 detectado pero falló:', e); }
   }
 
   // 2) v9+ modular con config global/preexistente
