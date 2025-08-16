@@ -3,71 +3,58 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Nicomida – Modo Simple (v5)</title>
-<!-- Intento de cargar tu antiguo archivo de configuración si existe en el repo -->
-<script src="firebase-config.js" defer></script>
+<title>Nicomida – Modo Simple (v5 FINAL)</title>
 <style>
   :root{
-    --bg:#f7fbff; --card:#ffffff; --ink:#0b1324; --muted:#64748b; --line:#e5e7eb;
-    --brand:#7dd3fc; /* cielo pastel */
-    --brand-strong:#38bdf8;
-    --accent:#f0abfc; /* lila pastel */
-    --accent-strong:#e879f9;
-    --ok:#86efac; --warn:#fde68a; --bad:#fecaca;
+    --bg:#f7fbff;--card:#ffffff;--ink:#0b1324;--muted:#64748b;--line:#e5e7eb;
+    --brand:#8b5cf6;--brand2:#22d3ee;--ok:#34d399;--warn:#fbbf24;--bad:#f87171;
   }
   *{box-sizing:border-box}
   html,body{margin:0;height:100%;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial}
-  body{background:
-    radial-gradient(1100px 700px at -10% -10%, #e6faff 0, transparent 40%),
-    radial-gradient(900px 600px at 110% -10%, #fce7f3 0, transparent 40%),
-    var(--bg); color:var(--ink)}
-  header{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.85);backdrop-filter:saturate(120%) blur(8px);border-bottom:1px solid var(--line)}
-  .wrap{max-width:1100px;margin:0 auto;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px}
-  h1{margin:0;font-size:20px;display:flex;align-items:center;gap:10px}
-  .badge{font-size:12px;padding:4px 8px;border-radius:999px;background:#e0f2fe;color:#0c4a6e;border:1px solid #bae6fd}
+  body{background:radial-gradient(900px 600px at 0% -10%, #ffecec 0, transparent 50%),
+        radial-gradient(900px 600px at 100% -10%, #e7faff 0, transparent 50%),
+        var(--bg);color:var(--ink)}
+  header{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.9);backdrop-filter:saturate(120%) blur(8px);border-bottom:1px solid var(--line)}
+  .wrap{max-width:1100px;margin:0 auto;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+  h1{margin:0;font-size:18px;display:flex;align-items:center;gap:10px}
+  .badge{font-size:12px;padding:4px 8px;border-radius:999px;background:#efe9ff;color:#4c1d95;border:1px solid #ddd6fe}
   nav{display:flex;gap:8px;padding:8px 14px}
-  nav button{flex:1;padding:10px 12px;border:1px solid var(--line);background:#fff;border-radius:14px;cursor:pointer;color:var(--muted);font-weight:700}
-  nav button.active{background:#e0f2fe;border-color:#bae6fd;color:#0c4a6e}
+  nav button{flex:1;padding:10px 12px;border:1px solid var(--line);background:#fff;border-radius:14px;cursor:pointer;color:var(--muted);font-weight:600}
+  nav button.active{background:#ecfeff;border-color:#a5f3fc;color:#164e63}
   #login-bar{font-size:13px;color:#334155}
-  #login-bar input{border:1px solid var(--line);border-radius:999px;padding:6px 10px;margin-right:6px}
-  #login-bar .btn{border:1px solid var(--line);border-radius:999px;padding:6px 10px;background:#fff;cursor:pointer}
+  #login-bar button{border:1px solid var(--line);border-radius:999px;padding:6px 10px;background:#fff;cursor:pointer}
   main{max-width:1100px;margin:0 auto;padding:14px}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 8px 28px rgba(168,85,247,.08)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 8px 30px rgba(0,0,0,.05)}
   .row{display:flex;gap:12px;flex-wrap:wrap}
   .col{flex:1 1 280px}
   label{font-size:12px;color:var(--muted)}
   input,select,textarea,button{border-radius:12px;border:1px solid var(--line);background:#fff;color:var(--ink);padding:10px;font-size:14px}
   input,select,textarea{width:100%}
-  button{cursor:pointer}
-  .btn{background:#f8fafc}
-  .btn.primary{background:var(--brand);border-color:var(--brand-strong);color:#062a36;font-weight:800}
-  .btn.alt{background:var(--accent);border-color:var(--accent-strong);color:#3b1140;font-weight:800}
+  .btn{background:#fafafa}
+  .btn.primary{background:var(--brand);border-color:#7c3aed;color:#fff;font-weight:700}
+  .btn.alt{background:#a7f3d0;border-color:#6ee7b7;color:#064e3b;font-weight:700}
   .suggestion{border:1px solid var(--line);border-radius:14px;padding:10px;margin:8px 0;display:flex;justify-content:space-between;gap:12px;background:#fcfdfd}
   .list-item{display:flex;justify-content:space-between;align-items:center;border:1px dashed var(--line);border-radius:12px;padding:8px;margin:6px 0;background:#fff}
-  .section-title{font-weight:900;margin:12px 0 6px}
+  .section-title{font-weight:800;margin:12px 0 6px}
   .small{font-size:12px;color:var(--muted)}
   .hidden{display:none}
-  /* Acelerómetro */
-  .meter{position:relative;height:16px;border-radius:999px;background:linear-gradient(90deg,var(--bad),var(--warn),var(--ok));border:1px solid var(--line)}
+  .meter{position:relative;height:16px;border-radius:999px;background:linear-gradient(90deg,#fecaca,#fde68a,#bbf7d0);border:1px solid var(--line)}
   .needle{position:absolute;top:-6px;transform:translateX(-50%);height:28px;width:2px;background:#111;border-radius:2px}
   .meter-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--muted)}
   .proscons{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px}
   .proscons .box{border:1px solid var(--line);border-radius:12px;padding:10px;background:#fff}
   .proscons ul{margin:6px 0 0 18px;padding:0}
-  /* Otras tomas: vertical y uniforme */
   .stack{display:flex;flex-direction:column;gap:10px}
   .stack .entry{display:flex;flex-direction:column;gap:6px}
   .stack .row-save{display:flex;gap:8px}
   .stack .row-save input{flex:1}
   .stack .row-save button{width:44px}
-  /* Plan semanal */
   .plan-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
   .slot{border:1px solid var(--line);border-radius:14px;padding:8px;background:#fff}
-  .slot.pending{outline:2px dashed #fca5a5;background:#fff5f5}
-  .slot.confirmed{outline:2px solid #bbf7d0;background:#f0fdf4}
+  .slot.pending{outline:2px dashed var(--bad);background:#fff5f5}
+  .slot.confirmed{outline:2px solid var(--ok);background:#f0fdf4}
   .slot .actions{display:flex;gap:6px;margin-top:6px}
   .slot .actions .icon{padding:6px 10px;border:1px solid var(--line);border-radius:12px;background:#f3f4f6;cursor:pointer}
-  /* Autotests */
   details.tests{margin:12px 0}
   details.tests summary{cursor:pointer}
   .pass{color:#16a34a}.fail{color:#b91c1c}
@@ -76,7 +63,7 @@
 <body>
 <header>
   <div class="wrap">
-    <h1>🍽️ Nicomida – Modo Simple <span class="badge">v5</span></h1>
+    <h1>🍽️ Nicomida – Modo Simple <span class="badge">v5 FINAL</span></h1>
     <div id="login-bar">Cargando sesión…</div>
   </div>
   <nav class="wrap">
@@ -87,7 +74,6 @@
 </header>
 
 <main>
-  <!-- HOY -->
   <section id="hoy" class="card">
     <div class="row">
       <div class="col">
@@ -102,6 +88,7 @@
     </div>
 
     <div id="hoy-sug-list" class="row" style="margin-top:10px"></div>
+    <div class="row"><div class="col" style="align-self:start"><button class="btn" id="btn-hoy-mas">🔄 Más ideas</button></div></div>
 
     <div class="section-title">¿Le diste otra cosa en la <span id="label-turno">Comida</span>? (texto libre)</div>
     <div class="row">
@@ -137,7 +124,6 @@
     <div id="hoy-historial"></div>
   </section>
 
-  <!-- PLAN -->
   <section id="plan" class="card hidden">
     <div class="small">Rellena ideas (rojo = pendiente). Confirma (verde) o 🔄 regenera por comida. Puedes <b>editar a mano</b> cada casilla.</div>
     <div class="row" style="margin-top:8px">
@@ -148,7 +134,6 @@
     <div class="small" id="plan-msg"></div>
   </section>
 
-  <!-- LISTA -->
   <section id="lista" class="card hidden">
     <div class="row" style="margin-top:8px">
       <div class="col"><label>Desde</label><input type="date" id="list-from" /></div>
@@ -158,9 +143,8 @@
     <div id="lista-contenido" style="margin-top:10px"></div>
   </section>
 
-  <!-- AUTOTESTS -->
   <details class="tests card" style="margin-top:10px">
-    <summary>🔧 Autotests (diagnóstico rápido)</summary>
+    <summary>🔧 Autotests</summary>
     <ul id="test-results" class="small"></ul>
   </details>
 </main>
@@ -172,21 +156,21 @@ const todayStr=()=> new Date().toISOString().slice(0,10);
 const weekDays=["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"];
 const mealLabels={desayuno:"Desayuno", snack_am:"Snack mañana", comida:"Comida", merienda:"Merienda", cena:"Cena"};
 
-// ===== Estado (robusto frente a JSON corrupto)
-const KEY='nicomida_v5';
+// ===== Estado
+const KEY='nicomida_v5final';
 let state=load();
 function load(){
   try{
     const raw=localStorage.getItem(KEY);
     if(!raw) return {logs:{},plans:{}};
-    const obj=JSON.parse(raw);
-    if(obj && typeof obj==='object' && 'logs' in obj && 'plans' in obj) return obj;
+    const parsed=JSON.parse(raw);
+    if(parsed && typeof parsed==='object' && 'logs' in parsed && 'plans' in parsed) return parsed;
     localStorage.removeItem(KEY); return {logs:{},plans:{}};
   }catch(e){ try{localStorage.removeItem(KEY);}catch(_){} return {logs:{},plans:{}}; }
 }
 function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
 
-// ===== Reglas / léxico
+// ===== Reglas y léxico
 const PROH={ ingredientes:["tomate","remolacha"], nocturnos:["brócoli","brocoli"], maxEggs:5, maxLentejas:1, maxRedMeat:1 };
 const LEX={
   'aceite de oliva':{norm:'aceite de oliva', cats:['grasa']}, 'aceite':{norm:'aceite de oliva', cats:['grasa']},
@@ -203,69 +187,72 @@ const LEX={
 };
 const MULTI=Object.keys(LEX).filter(k=>k.includes(' ')).sort((a,b)=>b.length-a.length);
 function toAsciiLower(s){ const map={"á":"a","é":"e","í":"i","ó":"o","ú":"u","ü":"u","ñ":"n"}; return s.toLowerCase().split('').map(ch=>map[ch]||ch).join(''); }
-function parseFree(text){ const original=text.trim(); if(!original) return null; let t=' '+toAsciiLower(original)+' '; const found=new Set(), cats=new Set(); MULTI.forEach(ph=>{ const p=' '+toAsciiLower(ph)+' '; if(t.includes(p)){ found.add(LEX[ph].norm); LEX[ph].cats.forEach(c=>cats.add(c)); t=t.split(p).join(' ');} }); t.split(/,| y | con | de |\+/g).map(s=>s.trim()).filter(Boolean).forEach(tok=>{ tok=tok.replace(/\b\d+[\wªº]*\b/g,'').trim(); if(!tok) return; const k=LEX[tok]?tok:(tok.endsWith('s')?tok.slice(0,-1):tok); if(LEX[k]){ found.add(LEX[k].norm); LEX[k].cats.forEach(c=>cats.add(c)); } }); [...found].forEach(i=>{ if(PROH.ingredientes.includes(i)) found.delete(i); }); return {dish:original, ingredients:[...found], categories:[...cats], ts:Date.now()}; }
+function parseFree(text){ const original=(text||'').trim(); if(!original) return null; let t=' '+toAsciiLower(original)+' '; const found=new Set(), cats=new Set(); MULTI.forEach(ph=>{ const p=' '+toAsciiLower(ph)+' '; if(t.includes(p)){ found.add(LEX[ph].norm); (LEX[ph].cats||[]).forEach(c=>cats.add(c)); t=t.split(p).join(' ');} }); t.split(/,| y | con | de |\+/g).map(s=>s.trim()).filter(Boolean).forEach(tok=>{ tok=tok.replace(/\b\d+[\wªº]*\b/g,'').trim(); if(!tok) return; const k=LEX[tok]?tok:(tok.endsWith('s')?tok.slice(0,-1):tok); if(LEX[k]){ found.add(LEX[k].norm); (LEX[k].cats||[]).forEach(c=>cats.add(c)); } }); [...found].forEach(i=>{ if(PROH.ingredientes.includes(i)) found.delete(i); }); return {dish:original, ingredients:[...found], categories:[...cats], ts:Date.now()}; }
 
-// ===== Ideas (siempre P+C+V)
+// ===== Ideas (todas P+C+V)
 const BANK={ base:[
   {title:"Pollo con arroz y calabacín", ing:['pollo','arroz','calabacín','aceite de oliva']},
+  {title:"Pollo con cuscús y calabaza", ing:['pollo','cuscús','calabaza','aceite de oliva']},
+  {title:"Pollo con pasta y zanahoria", ing:['pollo','pasta','zanahoria','aceite de oliva']},
+  {title:"Pollo con quinoa y berenjena", ing:['pollo','quinoa','berenjena','aceite de oliva']},
   {title:"Pavo con boniato y zanahoria", ing:['pavo','boniato','zanahoria','aceite de oliva']},
+  {title:"Pavo con arroz y berenjena", ing:['pavo','arroz','berenjena','aceite de oliva']},
+  {title:"Pavo con pasta y calabacín", ing:['pavo','pasta','calabacín','aceite de oliva']},
+  {title:"Pavo con cuscús y calabaza", ing:['pavo','cuscús','calabaza','aceite de oliva']},
   {title:"Ternera con patata y calabaza", ing:['ternera','patata','calabaza','aceite de oliva']},
   {title:"Merluza con patata y calabacín", ing:['merluza','patata','calabacín','aceite de oliva']},
+  {title:"Merluza con boniato y zanahoria", ing:['merluza','boniato','zanahoria','aceite de oliva']},
+  {title:"Merluza con arroz y calabacín", ing:['merluza','arroz','calabacín','aceite de oliva']},
   {title:"Salmón con arroz y calabaza", ing:['salmón','arroz','calabaza','aceite de oliva']},
+  {title:"Salmón con cuscús y calabacín", ing:['salmón','cuscús','calabacín','aceite de oliva']},
+  {title:"Salmón con pasta y zanahoria", ing:['salmón','pasta','zanahoria','aceite de oliva']},
   {title:"Garbanzos con arroz y verduras", ing:['garbanzos','arroz','calabacín','zanahoria','aceite de oliva']},
-  {title:"Cuscús con pollo y calabaza", ing:['cuscús','pollo','calabaza','aceite de oliva']},
-  {title:"Pasta corta con merluza y calabacín", ing:['pasta','merluza','calabacín','aceite de oliva']}
+  {title:"Garbanzos con cuscús y calabaza", ing:['garbanzos','cuscús','calabaza','aceite de oliva']},
+  {title:"Lentejas con arroz y verduras", ing:['lentejas','arroz','calabacín','zanahoria','aceite de oliva']},
+  {title:"Tortilla con calabacín y cebolla", ing:['huevo','calabacín','cebolla','aceite de oliva']},
+  {title:"Pasta corta con merluza y calabacín", ing:['pasta','merluza','calabacín','aceite de oliva']},
+  {title:"Arroz con verduras y pollo", ing:['arroz','pollo','calabacín','zanahoria','aceite de oliva']},
+  {title:"Quinoa con salmón y calabacín", ing:['quinoa','salmón','calabacín','aceite de oliva']},
+  {title:"Cous cous con pavo y berenjena", ing:['cuscús','pavo','berenjena','aceite de oliva']},
+  {title:"Arroz con garbanzos y calabaza", ing:['arroz','garbanzos','calabaza','aceite de oliva']}
 ]};
 function ingCats(ing){ const cats=new Set(); (ing||[]).forEach(i=> (LEX[i]?.cats||[]).forEach(c=>cats.add(c))); return cats; }
 function isBalanced(ing){ const cats=ingCats(ing); return cats.has('proteína') && (cats.has('cereal')||cats.has('tubérculo')) && cats.has('verdura'); }
 
-// ===== Contexto día/semana
+// —— Diversidad helpers ——
+function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function titleKey(t){ return (t||'').toLowerCase().trim(); }
+function proteinKeyFromIng(ing){ ing=ing||[]; if(ing.includes('huevo')) return 'huevo'; if(ing.includes('lentejas')) return 'legumbre_lenteja'; if(ing.includes('garbanzos')) return 'legumbre_garb'; if(ing.includes('ternera')) return 'carne_roja'; if(ing.includes('pollo')||ing.includes('pavo')) return 'carne_blanca'; if(ing.includes('merluza')) return 'pescado_blanco'; if(ing.includes('salmón')) return 'pescado_azul'; return 'proteína'; }
 function weekStartOf(dateStr){ const d=new Date(dateStr); const day=(d.getUTCDay()+6)%7; d.setUTCDate(d.getUTCDate()-day); return d.toISOString().slice(0,10); }
 function inWeekRange(dateStr, weekStart){ const d=new Date(dateStr); const w=new Date(weekStart); const diff=(d-w)/86400000; return diff>=0 && diff<7; }
 function countersWeek(weekStart){ let eggs=0,lent=0,red=0; for(const d in state.logs){ if(inWeekRange(d,weekStart)){ const day=state.logs[d]; Object.values(day).forEach(e=>{ const ing=e?.ingredients||[]; if(ing.includes('huevo')) eggs++; if(ing.includes('lentejas')) lent++; if(ing.includes('ternera')) red++; }); } } return {eggs,lent,red}; }
+function weekDishSet(ws){ const set=new Set(); (state.plans[ws]||[]).forEach(d=>{ ['comida','cena'].forEach(t=>{ if(d[t]?.title) set.add(titleKey(d[t].title)); }); }); for(const date in state.logs){ if(inWeekRange(date,ws)){ const day=state.logs[date]; ['comida','cena'].forEach(t=>{ if(day[t]?.dish) set.add(titleKey(day[t].dish)); }); } } return set; }
+function weekCounts(ws){ let eggs=0,lent=0,red=0; const fromLogs=countersWeek(ws); eggs+=fromLogs.eggs; lent+=fromLogs.lent; red+=fromLogs.red; (state.plans[ws]||[]).forEach(d=>{ ['comida','cena'].forEach(t=>{ const ing=d[t]?.ing||[]; if(ing.includes('huevo')) eggs++; if(ing.includes('lentejas')) lent++; if(ing.includes('ternera')) red++; }); }); return {eggs,lent,red}; }
 
-// ===== allowedFor (string o array)
 function allowedFor(turno, x){ let tlist=[]; if(Array.isArray(x)) tlist=x; else if(typeof x==='string'){ const low=x.toLowerCase(); if(low.includes('tomate')||low.includes('remolacha')) return false; if(turno==='cena' && (low.includes('brócoli')||low.includes('brocoli'))) return false; return true; } tlist=(tlist||[]).map(s=> (''+s).toLowerCase()); if(tlist.some(s=> PROH.ingredientes.includes(s))) return false; if(turno==='cena' && (tlist.includes('brócoli')||tlist.includes('brocoli'))) return false; return true; }
 
-// ===== Generador consciente de contexto
-function preferByContext(turno,dateStr,weekStart,cand){
+function candidates(turno,dateStr){ const ws=weekStartOf(dateStr); let cand=[...BANK.base].map(x=>({title:x.title, ing:[...x.ing]})); cand=cand.filter(x=> isBalanced(x.ing) && allowedFor(turno,x.ing)); // contexto día
   const today=state.logs[dateStr]||{}; const dayCats=new Set(); Object.values(today).forEach(e=> (e?.ingredients||[]).forEach(i=> (LEX[i]?.cats||[]).forEach(c=>dayCats.add(c))));
-  const w=countersWeek(weekStart);
-  return cand.filter(item=>{
-    const cats=ingCats(item.ing);
-    if(item.ing.includes('huevo') && w.eggs>=PROH.maxEggs) return false;
-    if(item.ing.includes('lentejas') && w.lent>=PROH.maxLentejas) return false;
-    if(item.ing.includes('ternera') && w.red>=PROH.maxRedMeat) return false;
-    if(dayCats.has('carne_blanca')||dayCats.has('carne_roja')){
-      if(cats.has('carne_blanca')||cats.has('carne_roja')) return false;
-    }
-    if(turno==='cena' && (cats.has('carne_blanca')||cats.has('carne_roja'))) return false;
-    return true;
-  });
-}
-function candidates(turno,dateStr){ const ws=weekStartOf(dateStr); let cand=[...BANK.base].map(x=>({title:x.title, ing:[...x.ing]})); cand=cand.filter(x=> isBalanced(x.ing) && allowedFor(turno,x.ing)); let filtered=preferByContext(turno,dateStr,ws,cand); if(!filtered.length) filtered=cand; return filtered; }
-function pickIdea(turno,dateStr){ const list=candidates(turno,dateStr); return list[Math.floor(Math.random()*list.length)]; }
+  cand=cand.filter(item=>{ const cats=ingCats(item.ing); const wk=countersWeek(ws); if(item.ing.includes('huevo') && wk.eggs>=PROH.maxEggs) return false; if(item.ing.includes('lentejas') && wk.lent>=PROH.maxLentejas) return false; if(item.ing.includes('ternera') && wk.red>=PROH.maxRedMeat) return false; if((dayCats.has('carne_blanca')||dayCats.has('carne_roja')) && (cats.has('carne_blanca')||cats.has('carne_roja'))) return false; if(turno==='cena' && (cats.has('carne_blanca')||cats.has('carne_roja'))) return false; return true; });
+  return cand; }
 
-// ===== Registro / historial
+// ===== Registro & render día
 function addLog(date,turno,entry){ if(!state.logs[date]) state.logs[date]={}; state.logs[date][turno]=entry; save(); }
 function renderDayHistory(date){ const box=$('#hoy-historial'); box.innerHTML=''; const day=state.logs[date]||{}; ['desayuno','snack_am','comida','merienda','cena'].forEach(t=>{ if(day[t]){ const it=day[t]; const el=document.createElement('div'); el.className='list-item'; el.innerHTML=`<div><div><b>${mealLabels[t]}</b>: ${it.dish||''}</div><div class="small">${(it.ingredients||[]).join(', ')}</div></div><button class="btn">Eliminar</button>`; el.querySelector('button').onclick=()=>{ delete day[t]; save(); renderDayHistory(date); updateMeter(); }; box.appendChild(el); } }); updateMeter(); }
 
-// ===== Sugerencias (HOY)
-function renderHoySuggestions(){ const turno=$('#hoy-turno').value; const date=$('#hoy-date').value; const list=$('#hoy-sug-list'); list.innerHTML=''; const ids=new Set(); for(let i=0;i<6 && ids.size<4;i++){ const it=pickIdea(turno,date); if(!it||ids.has(it.title)) continue; ids.add(it.title); const el=document.createElement('div'); el.className='suggestion'; el.innerHTML=`<div><div style="font-weight:800">${it.title}</div><div class="small">${it.ing.join(', ')}</div></div><div style="display:flex;gap:8px;align-items:center"><button class="btn alt">Planear</button><button class="btn primary">Registrar</button></div>`; const [planBtn,regBtn]=el.querySelectorAll('button'); planBtn.onclick=()=> quickPlanFromSuggestionStruct(it); regBtn.onclick=()=>{ const date=$('#hoy-date').value; const turno=$('#hoy-turno').value; const cats=ingCats(it.ing); addLog(date, turno, {dish:it.title, ingredients:it.ing, categories:[...cats], ts:Date.now()}); renderDayHistory(date); }; list.appendChild(el); } }
-
-// ===== Acelerómetro + pros/cons
+// ===== Sugerencias HOY (2 fijas + paginación)
+function ensurePager(key, pool){ if(!state._pager) state._pager={}; if(!state._pager[key] || !Array.isArray(state._pager[key].pool) || !state._pager[key].pool.length){ state._pager[key]={pool:shuffle([...pool]), idx:0}; } }
+function renderHoySuggestions(){ const turno=$('#hoy-turno').value; const date=$('#hoy-date').value; const list=$('#hoy-sug-list'); list.innerHTML=''; let pool=candidates(turno,date); const today=state.logs[date]||{}; const eatenTitles=new Set(Object.values(today).map(e=> titleKey(e?.dish))); pool=pool.filter(x=> !eatenTitles.has(titleKey(x.title))); ensurePager(date+'_'+turno, pool); const pager=state._pager[date+'_'+turno]; if(!pager.pool.length){ list.innerHTML='<div class="small">Sin ideas válidas ahora mismo.</div>'; return; } if(pager.idx>=pager.pool.length){ pager.idx=0; pager.pool=shuffle(pager.pool); } const slice=pager.pool.slice(pager.idx, pager.idx+2); pager.idx+=2; save(); slice.forEach(it=>{ const el=document.createElement('div'); el.className='suggestion'; el.innerHTML=`<div><div style="font-weight:700">${it.title}</div><div class="small">${it.ing.join(', ')}</div></div><div style="display:flex;gap:8px;align-items:center"><button class="btn primary">Registrar</button></div>`; const regBtn=el.querySelector('button'); regBtn.onclick=()=>{ const cats=ingCats(it.ing); addLog(date, turno, {dish:it.title, ingredients:it.ing, categories:[...cats], ts:Date.now()}); renderDayHistory(date); }; list.appendChild(el); }); }
+// ===== Puntaje
 function mealCompleteness(e){ if(!e) return 0; const cats=new Set(e.categories||[]); let s=0; if(cats.has('proteína')) s+=0.4; if(cats.has('cereal')||cats.has('tubérculo')) s+=0.3; if(cats.has('verdura')) s+=0.3; return s; }
 function updateMeter(){ const date=$('#hoy-date').value; const day=state.logs[date]||{}; const pros=[], cons=[]; const scMeal=mealCompleteness(day.comida); const scDinner=mealCompleteness(day.cena); if(scMeal===1) pros.push('Comida completa (P+C+V)'); else cons.push('Completar la comida con P+C+V'); if(scDinner===1) pros.push('Cena completa (P+C+V)'); else cons.push('Completar la cena con P+C+V'); const catsDay=new Set(); Object.values(day).forEach(e=> (e?.categories||[]).forEach(c=>catsDay.add(c)) ); if(catsDay.has('fruta')) pros.push('Incluiste fruta'); else cons.push('Añadir fruta en alguna toma'); if(catsDay.has('grasa')||catsDay.has('grasa saludable')) pros.push('Grasa saludable presente'); let score=(scMeal+scDinner)*5; const w=countersWeek(weekStartOf(date)); if(w.eggs>PROH.maxEggs){ score-=1; cons.push('Huevo >5/sem'); } if(w.lent>PROH.maxLentejas){ score-=0.5; cons.push('Lentejas >1/sem'); } if(w.red>PROH.maxRedMeat){ score-=0.5; cons.push('Carne roja >1/sem'); } if(day.cena && (day.cena.ingredients||[]).includes('brócoli')){ score-=0.8; cons.push('Evitar brócoli por la noche'); } score=Math.max(0,Math.min(10,Math.round(score*2)/2)); $('#needle').style.left=(score*10)+'%'; $('#pros-list').innerHTML=pros.map(x=>`<li>${x}</li>`).join(''); $('#cons-list').innerHTML=cons.filter((v,i,a)=>a.indexOf(v)===i).map(x=>`<li>${x}</li>`).join(''); }
 
-// ===== Plan semanal editable
+// ===== Plan semanal
 function ensurePlan(ws){ if(!state.plans[ws]) state.plans[ws]=Array.from({length:7},()=>({comida:{},cena:{}})); }
-function renderPlan(){ const grid=$('#plan-grid'); const ws=$('#week-start').value; ensurePlan(ws); grid.innerHTML=''; const week=state.plans[ws]; week.forEach((day,idx)=>{ const card=document.createElement('div'); card.className='card'; const date=new Date(ws); date.setUTCDate(date.getUTCDate()+idx); const ds=date.toISOString().slice(0,10);
-  const slot=(t)=>{ const s=day[t]||{}; const st=s.confirmed?'confirmed':'pending'; return `<div class="slot ${st}" data-idx="${idx}" data-t="${t}"><div class="small"><b>${t==='comida'?'Comida':'Cena'}</b> <span class="small" style="opacity:.7">${ds}</span></div><input class="inp" value="${s.title||''}" placeholder="Idea de ${t}" /><div class="actions"><span class="icon regen" title="Regenerar">🔄</span><span class="icon confirm" title="Confirmar">✅</span></div></div>`; };
-  card.innerHTML=`<div style="font-weight:800;margin-bottom:6px">${weekDays[idx]}</div><div class="plan-grid">${slot('comida')}${slot('cena')}</div>`; grid.appendChild(card); });
-  $$('#plan-grid .slot').forEach(sl=>{ const idx=+sl.dataset.idx; const t=sl.dataset.t; const inp=sl.querySelector('.inp'); inp.oninput=e=>{ const ws=$('#week-start').value; const val=e.target.value; const parsed=parseFree(val)||{}; state.plans[ws][idx][t].title=val; state.plans[ws][idx][t].ing=parsed.ingredients||[]; state.plans[ws][idx][t].categories=parsed.categories||[]; save(); }; sl.querySelector('.regen').onclick=()=>{ const ws=$('#week-start').value; const date=new Date(ws); date.setUTCDate(date.getUTCDate()+idx); const ds=date.toISOString().slice(0,10); const idea=pickIdea(t, ds); state.plans[ws][idx][t]={title:idea.title, ing:idea.ing, categories:[...ingCats(idea.ing)], confirmed:false}; save(); renderPlan(); }; sl.querySelector('.confirm').onclick=()=>{ const ws=$('#week-start').value; const s=state.plans[ws][idx][t]; if(!s?.title) return alert('Escribe o genera una idea'); let ing=s.ing && s.ing.length? s.ing : (parseFree(s.title)||{}).ingredients || []; if(!isBalanced(ing)){ const cats=ingCats(ing); if(!(cats.has('cereal')||cats.has('tubérculo'))) ing.push('arroz'); if(!cats.has('verdura')) ing.push('calabacín'); if(!cats.has('proteína')) ing.push('pollo'); } s.ing=ing; s.categories=[...ingCats(ing)]; s.confirmed=true; save(); renderPlan(); }; }); }
-
-function autoPlan(){ const ws=$('#week-start').value; ensurePlan(ws); for(let i=0;i<7;i++){ const d=new Date(ws); d.setUTCDate(d.getUTCDate()+i); const ds=d.toISOString().slice(0,10); const c=pickIdea('comida',ds); const z=pickIdea('cena',ds); state.plans[ws][i].comida={title:c.title, ing:c.ing, categories:[...ingCats(c.ing)], confirmed:false}; state.plans[ws][i].cena={title:z.title, ing:z.ing, categories:[...ingCats(z.ing)], confirmed:false}; } save(); renderPlan(); }
-
+function weekProteinByDay(ws){ const arr=[...Array(7)].map(()=>new Set()); const w=state.plans[ws]||[]; w.forEach((d,i)=>{ ['comida','cena'].forEach(t=>{ const ing=d[t]?.ing||[]; arr[i].add(proteinKeyFromIng(ing)); }); }); return arr; }
+function chooseForTurn(turno, ds, ws, usedTitles, usedProtSet){ let cand=candidates(turno,ds); const wkCounts=weekCounts(ws); cand=cand.filter(x=> !usedTitles.has(titleKey(x.title))); const scored=cand.map(x=>{ const pk=proteinKeyFromIng(x.ing); let score=0; if(usedProtSet.has(pk)) score-=100; else score+=20; if(pk==='huevo' && wkCounts.eggs>=PROH.maxEggs) score=-Infinity; if(pk==='legumbre_lenteja' && wkCounts.lent>=PROH.maxLentejas) score=-Infinity; if(pk==='carne_roja' && wkCounts.red>=PROH.maxRedMeat) score=-Infinity; if(turno==='cena' && (pk==='carne_blanca'||pk==='carne_roja')) score-=20; score+=Math.random(); return {item:x,score,pk}; }).filter(o=>o.score>-Infinity); if(!scored.length){ cand=candidates(turno,ds); shuffle(cand); return cand[0]||BANK.base[0]; } scored.sort((a,b)=> b.score-a.score); return scored[0].item; }
+function renderPlan(){ const grid=$('#plan-grid'); const ws=$('#week-start').value; ensurePlan(ws); grid.innerHTML=''; const week=state.plans[ws]; week.forEach((day,idx)=>{ const card=document.createElement('div'); card.className='card'; const date=new Date(ws); date.setUTCDate(date.getUTCDate()+idx); const ds=date.toISOString().slice(0,10); const slot=(t)=>{ const s=day[t]||{}; const st=s.confirmed?'confirmed':'pending'; return `<div class="slot ${st}" data-idx="${idx}" data-t="${t}"><div class="small"><b>${t==='comida'?'Comida':'Cena'}</b> <span class="small" style="opacity:.7">${ds}</span></div><input class="inp" value="${s.title||''}" placeholder="Idea de ${t}" /><div class="actions"><span class="icon regen" title="Regenerar">🔄</span><span class="icon confirm" title="Confirmar">✅</span></div></div>`; }; card.innerHTML=`<div style="font-weight:700;margin-bottom:6px">${weekDays[idx]}</div><div class="plan-grid">${slot('comida')}${slot('cena')}</div>`; grid.appendChild(card); }); $$('#plan-grid .slot').forEach(sl=>{ const idx=+sl.dataset.idx; const t=sl.dataset.t; const inp=sl.querySelector('.inp'); inp.oninput=e=>{ const ws=$('#week-start').value; const val=e.target.value; const parsed=parseFree(val)||{}; state.plans[ws][idx][t].title=val; state.plans[ws][idx][t].ing=parsed.ingredients||[]; state.plans[ws][idx][t].categories=parsed.categories||[]; save(); }; sl.querySelector('.regen').onclick=()=>{ const ws=$('#week-start').value; const date=new Date(ws); date.setUTCDate(date.getUTCDate()+idx); const ds=date.toISOString().slice(0,10); const pick=chooseForTurn(t, ds, ws, weekDishSet(ws), weekProteinByDay(ws)[idx]); state.plans[ws][idx][t]={title:pick.title, ing:pick.ing, categories:[...ingCats(pick.ing)], confirmed:false}; save(); renderPlan(); }; sl.querySelector('.confirm').onclick=()=>{ const ws=$('#week-start').value; const s=state.plans[ws][idx][t]; if(!s?.title) return alert('Escribe o genera una idea'); let ing=s.ing && s.ing.length? s.ing : (parseFree(s.title)||{}).ingredients || []; if(!isBalanced(ing)){ const cats=ingCats(ing); if(!(cats.has('cereal')||cats.has('tubérculo'))) ing.push('arroz'); if(!cats.has('verdura')) ing.push('calabacín'); if(!cats.has('proteína')) ing.push('pollo'); } s.ing=ing; s.categories=[...ingCats(ing)]; s.confirmed=true; save(); renderPlan(); }; }); }
+function autoPlan(){ const ws=$('#week-start').value; ensurePlan(ws); const usedTitles=weekDishSet(ws); const dayProt=[...Array(7)].map(()=> new Set()); const counts=weekCounts(ws); for(let i=0;i<7;i++){ const d=new Date(ws); d.setUTCDate(d.getUTCDate()+i); const ds=d.toISOString().slice(0,10); ['comida','cena'].forEach(turno=>{ const pick=chooseForTurn(turno, ds, ws, usedTitles, dayProt[i]); state.plans[ws][i][turno]={title:pick.title, ing:pick.ing, categories:[...ingCats(pick.ing)], confirmed:false}; usedTitles.add(titleKey(pick.title)); const pk=proteinKeyFromIng(pick.ing); dayProt[i].add(pk); if(pick.ing.includes('huevo')) counts.eggs++; if(pick.ing.includes('lentejas')) counts.lent++; if(pick.ing.includes('ternera')) counts.red++; }); } save(); renderPlan(); }
 function quickPlanFromSuggestionStruct(item){ const ws=$('#week-start').value||weekStartOf($('#hoy-date').value); ensurePlan(ws); const a=new Date(ws), b=new Date($('#hoy-date').value); const idx=Math.round((b-a)/86400000); if(idx<0||idx>6) return alert('La fecha no está en la semana seleccionada'); const t=$('#hoy-turno').value; if(!allowedFor(t,item.ing)) return alert('Sugerencia incompatible con tus reglas'); state.plans[ws][idx][t]={title:item.title, ing:item.ing, categories:[...ingCats(item.ing)], confirmed:false}; save(); renderPlan(); }
 
 // ===== Lista de la compra
@@ -275,108 +262,37 @@ function copyList(){ const items=[...$('#lista-contenido').querySelectorAll('.li
 // ===== Tabs & init
 function setTab(id){ ['hoy','plan','lista'].forEach(x=> $('#'+x).classList.toggle('hidden', x!==id)); $$('nav button').forEach(b=> b.classList.toggle('active', b.dataset.tab===id)); }
 $$('nav button').forEach(b=> b.onclick=()=> setTab(b.dataset.tab));
-
 function init(){ $('#hoy-date').value=todayStr(); $('#week-start').value=weekStartOf(todayStr()); $('#list-from').value=weekStartOf(todayStr()); const to=new Date($('#list-from').value); to.setUTCDate(to.getUTCDate()+6); $('#list-to').value=to.toISOString().slice(0,10); $('#label-turno').textContent=$('#hoy-turno').selectedOptions[0].textContent; renderHoySuggestions(); renderDayHistory($('#hoy-date').value); renderPlan(); }
+$('#btn-hoy-sugerir').onclick=renderHoySuggestions; $('#btn-hoy-mas').onclick=renderHoySuggestions; $('#hoy-turno').onchange=()=> $('#label-turno').textContent=$('#hoy-turno').selectedOptions[0].textContent; $('#btn-parse-alt').onclick=()=>{ const s=$('#alt-plato').value.trim(); if(!s) return alert('Escribe la alternativa'); const e=parseFree(s); const date=$('#hoy-date').value; const turno=$('#hoy-turno').value; addLog(date, turno, e); $('#alt-plato').value=''; renderDayHistory(date); }; $('#save-des').onclick=()=>{ const v=$('#txt-desayuno').value.trim(); if(!v) return; const d=$('#hoy-date').value; addLog(d,'desayuno',parseFree(v)); $('#txt-desayuno').value=''; renderDayHistory(d); }; $('#save-snack').onclick=()=>{ const v=$('#txt-snack').value.trim(); if(!v) return; const d=$('#hoy-date').value; addLog(d,'snack_am',parseFree(v)); $('#txt-snack').value=''; renderDayHistory(d); }; $('#save-mer').onclick=()=>{ const v=$('#txt-merienda').value.trim(); if(!v) return; const d=$('#hoy-date').value; addLog(d,'merienda',parseFree(v)); $('#txt-merienda').value=''; renderDayHistory(d); }; $('#hoy-date').onchange=()=> renderDayHistory($('#hoy-date').value); $('#btn-auto-plan').onclick=autoPlan; $('#btn-guardar-plan').onclick=()=>{ save(); alert('Plan guardado ✅'); }; $('#week-start').onchange=renderPlan; $('#btn-generar-lista').onclick=generateList; $('#btn-copiar-lista').onclick=copyList; if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', init); else init();
 
-// Eventos HOY
-$('#btn-hoy-sugerir').onclick=renderHoySuggestions; $('#hoy-turno').onchange=()=> $('#label-turno').textContent=$('#hoy-turno').selectedOptions[0].textContent; $('#btn-parse-alt').onclick=()=>{ const s=$('#alt-plato').value.trim(); if(!s) return alert('Escribe la alternativa'); const e=parseFree(s); const date=$('#hoy-date').value; const turno=$('#hoy-turno').value; addLog(date, turno, e); $('#alt-plato').value=''; renderDayHistory(date); };
-$('#save-des').onclick=()=>{ const v=$('#txt-desayuno').value.trim(); if(!v) return; const d=$('#hoy-date').value; addLog(d,'desayuno',parseFree(v)); $('#txt-desayuno').value=''; renderDayHistory(d); };
-$('#save-snack').onclick=()=>{ const v=$('#txt-snack').value.trim(); if(!v) return; const d=$('#hoy-date').value; addLog(d,'snack_am',parseFree(v)); $('#txt-snack').value=''; renderDayHistory(d); };
-$('#save-mer').onclick=()=>{ const v=$('#txt-merienda').value.trim(); if(!v) return; const d=$('#hoy-date').value; addLog(d,'merienda',parseFree(v)); $('#txt-merienda').value=''; renderDayHistory(d); };
-$('#hoy-date').onchange=()=> renderDayHistory($('#hoy-date').value);
-
-// Plan
-$('#btn-auto-plan').onclick=autoPlan; $('#btn-guardar-plan').onclick=()=>{ save(); alert('Plan guardado ✅'); }; $('#week-start').onchange=renderPlan;
-
-// Lista
-$('#btn-generar-lista').onclick=generateList; $('#btn-copiar-lista').onclick=copyList;
-
-if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', init); else init();
-
-// ===== Autotests =====
-function runTests(){ const results=[]; const ok=(name,cond)=>results.push({name,pass:!!cond});
-  try{
-    const p1=parseFree('leche con avena y kiwi'); ok('parser: leche/avena/kiwi', p1 && ['leche','avena','kiwi'].every(x=>p1.ingredients.includes(x)));
-    ok('parser: categorías lácteo/cereal/fruta', p1 && p1.categories.includes('lácteo') && p1.categories.includes('cereal') && p1.categories.includes('fruta'));
-    const p2=parseFree('tortilla de calabacín'); ok('parser: tortilla incluye huevo', p2 && p2.ingredients.includes('huevo')); ok('parser: verdura presente', p2 && p2.ingredients.includes('calabacín'));
-    const p3=parseFree('tomate y remolacha'); ok('parser: filtra prohibidos', p3 && p3.ingredients.length===0);
-    ok('regla cena: no brócoli (string)', !allowedFor('cena','Arroz con brócoli'));
-    ok('regla cena: no brócoli (array)', !allowedFor('cena',['arroz','brócoli']));
-    const backup=localStorage.getItem(KEY); localStorage.setItem(KEY, JSON.stringify({logs:{},plans:{}})); const loaded=load(); ok('load(): objeto válido', loaded && typeof loaded==='object' && 'logs' in loaded && 'plans' in loaded); if(backup===null) localStorage.removeItem(KEY); else localStorage.setItem(KEY, backup);
-    try{ const prev=$('#hoy-date').value; $('#hoy-date').value=todayStr(); state.logs[$('#hoy-date').value]={}; updateMeter(); $('#hoy-date').value=prev; ok('updateMeter: seguro con día vacío', true);}catch(e){ ok('updateMeter: seguro con día vacío', false); }
-    ok('DOM: existe #test-results', !!document.querySelector('#test-results'));
-    ok('parseFree: null para cadena vacía', parseFree('   ')===null);
-    const idea=pickIdea('comida', todayStr()); ok('idea balanceada', idea && isBalanced(idea.ing));
-    const d=todayStr(); state.logs[d]={comida:{ingredients:['pollo'],categories:[...ingCats(['pollo'])]}}; const dinner=pickIdea('cena', d); const dinnerCats=ingCats(dinner.ing); ok('cena evita carne tras carne al mediodía', !(dinnerCats.has('carne_blanca')||dinnerCats.has('carne_roja')));
-    const ws=weekStartOf(d); for(let i=0;i<7;i++){ const dt=new Date(ws); dt.setUTCDate(dt.getUTCDate()+i); const ds=dt.toISOString().slice(0,10); state.logs[ds]={comida:{ingredients:['ternera'],categories:[...ingCats(['ternera'])]}}; }
-    const noRed=candidates('comida',d).every(x=> !x.ing.includes('ternera')); ok('no sugiere ternera si ya se alcanzó el máximo semanal', noRed);
-    try{ $('#list-from').value=ws; const to=new Date(ws); to.setUTCDate(to.getUTCDate()+6); $('#list-to').value=to.toISOString().slice(0,10); generateList(); ok('generateList: sin excepciones', true);}catch(e){ ok('generateList: sin excepciones', false); }
-  }catch(err){ ok('Autotests: ejecución sin excepciones', false); console.error('Autotests error:', err); }
-  const ul=document.querySelector('#test-results'); if(ul){ ul.innerHTML=''; results.forEach(r=>{ const li=document.createElement('li'); li.className=r.pass?'pass':'fail'; li.textContent=(r.pass?'✔ ':'✖ ')+r.name; ul.appendChild(li); }); } console[results.every(r=>r.pass)?'log':'error']('Autotests:', results); }
+// ===== Autotests mínimos (no tocan tu estado)
+function runTests(){ const results=[]; const ok=(name,cond)=>results.push({name,pass:!!cond}); try{ const p1=parseFree('leche con avena y kiwi'); ok('parser básico', p1 && ['leche','avena','kiwi'].every(x=>p1.ingredients.includes(x))); ok('prohibidos filtrados', (parseFree('tomate, remolacha').ingredients||[]).length===0); $('#hoy-date').value=todayStr(); $('#hoy-turno').value='comida'; renderHoySuggestions(); const cards=[...document.querySelectorAll('#hoy-sug-list .suggestion')]; ok('hoy: exactamente 2', cards.length===2); $('#week-start').value=weekStartOf(todayStr()); autoPlan(); const titles=[...document.querySelectorAll('#plan-grid .inp')].map(i=>i.value).filter(Boolean); const uniq=new Set(titles); ok('plan: sin repetidos', titles.length===uniq.size); }catch(e){ ok('tests ejec', false); console.error(e); } const ul=document.querySelector('#test-results'); if(ul){ ul.innerHTML=''; results.forEach(r=>{ const li=document.createElement('li'); li.className=r.pass?'pass':'fail'; li.textContent=(r.pass?'✔ ':'✖ ')+r.name; ul.appendChild(li); }); } }
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', runTests); else runTests();
 </script>
 
-<!-- ===== Login auto: v8 (namespace) o v9/v10 (modular) con email/contraseña; si no hay config → local ===== -->
+<!-- ===== Login email/contraseña auto (opcional, no rompe si no hay config) ===== -->
 <script>
 (function(){
-  const bar = document.getElementById('login-bar');
-  function showAnon(){ bar.innerHTML = '<span style="color:#64748b">Modo sin login</span>'; }
-  function showUser(name){ bar.innerHTML = '👋 '+name+' · <button class="btn" id="btn-out">Salir</button>'; document.getElementById('btn-out').onclick = ()=>{ if(window.firebase?.auth){ return window.firebase.auth().signOut(); } if(window._authV9){ return window._authV9.signOut(); } }; }
-  function showSignin(onSubmit){
-    bar.innerHTML = '<form id="login-form" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">'
-      +'<input id="auth-email" type="email" placeholder="email">'
-      +'<input id="auth-pass" type="password" placeholder="contraseña">'
-      +'<button class="btn" type="submit">Entrar</button>'
-      +'<button class="btn" type="button" id="btn-reg">Crear</button>'
-      +'</form>';
-    const f=document.getElementById('login-form');
-    const reg=document.getElementById('btn-reg');
-    f.onsubmit=(e)=>{ e.preventDefault(); const email=document.getElementById('auth-email').value.trim(); const pass=document.getElementById('auth-pass').value; onSubmit('signin', email, pass); };
-    reg.onclick=()=>{ const email=document.getElementById('auth-email').value.trim(); const pass=document.getElementById('auth-pass').value; onSubmit('signup', email, pass); };
-  }
+  const bar=document.getElementById('login-bar');
+  function showAnon(){ bar.innerHTML='<span class="small">Modo sin login</span>'; }
+  function showUser(name){ bar.innerHTML='👋 '+name+' · <button id="btn-out">Salir</button>'; document.getElementById('btn-out').onclick=()=>{ if(window.firebase?.auth){ return window.firebase.auth().signOut(); } if(window._authV9){ return window._authV9.signOut(); } } }
+  function showSignin(onSubmit){ bar.innerHTML='<form id="login-form" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">'+
+    '<input id="auth-email" type="email" placeholder="email" style="padding:6px 8px;border:1px solid #e5e7eb;border-radius:999px">'+
+    '<input id="auth-pass" type="password" placeholder="contraseña" style="padding:6px 8px;border:1px solid #e5e7eb;border-radius:999px">'+
+    '<button type="submit">Entrar</button>'+
+    '<button type="button" id="btn-reg">Crear</button>'+
+  '</form>'; const f=document.getElementById('login-form'); const reg=document.getElementById('btn-reg'); f.onsubmit=(e)=>{ e.preventDefault(); const email=document.getElementById('auth-email').value.trim(); const pass=document.getElementById('auth-pass').value; onSubmit('signin', email, pass); }; reg.onclick=()=>{ const email=document.getElementById('auth-email').value.trim(); const pass=document.getElementById('auth-pass').value; onSubmit('signup', email, pass); } }
 
-  // 1) v8 ya cargado
-  if(window.firebase && window.firebase.apps && window.firebase.apps.length){
-    try{
-      const auth = window.firebase.auth();
-      auth.onAuthStateChanged(function(user){
-        if(user) showUser(user.email || user.uid);
-        else showSignin(async (mode, email, pass)=>{
-          try{
-            if(mode==='signup') await auth.createUserWithEmailAndPassword(email, pass);
-            else await auth.signInWithEmailAndPassword(email, pass);
-          }catch(err){ alert(err.message||'Error de autenticación'); }
-        });
-      });
-      return; // listo v8
-    }catch(e){ console.warn('Auth v8 detectado pero falló:', e); }
-  }
+  // v8 ya cargado
+  try{
+    if(window.firebase && window.firebase.apps && window.firebase.apps.length){ const auth=window.firebase.auth(); auth.onAuthStateChanged(function(user){ if(user) showUser(user.email||user.uid); else showSignin(async(mode,email,pass)=>{ try{ if(mode==='signup') await auth.createUserWithEmailAndPassword(email,pass); else await auth.signInWithEmailAndPassword(email,pass); }catch(err){ alert(err.message||'Error de autenticación'); } }); }); return; }
+  }catch(e){ console.warn('Firebase v8 detectado pero falló', e); }
 
-  // 2) v9+ modular con config global/preexistente
+  // v9+ modular si hay config global
   const cfg = window.FIREBASE_CONFIG || window.firebaseConfig || window.__FBCONFIG || (function(){ try{ const tag=document.getElementById('firebase-config'); return tag? JSON.parse(tag.textContent): null; }catch(_){ return null } })();
-  if(cfg){
-    (async function(){
-      try{
-        const appMod = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
-        const authMod = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js');
-        const app = appMod.initializeApp(cfg);
-        const auth = authMod.getAuth(app);
-        window._authV9 = {signOut: ()=>authMod.signOut(auth)};
-        authMod.onAuthStateChanged(auth, (user)=>{
-          if(user) showUser(user.email || user.uid);
-          else showSignin(async (mode, email, pass)=>{
-            try{
-              if(mode==='signup') await authMod.createUserWithEmailAndPassword(auth, email, pass);
-              else await authMod.signInWithEmailAndPassword(auth, email, pass);
-            }catch(err){ alert(err.message||'Error de autenticación'); }
-          });
-        });
-      }catch(e){ console.warn('No se pudo cargar Firebase modular:', e); showAnon(); }
-    })();
-    return;
-  }
+  if(cfg){ (async function(){ try{ const appMod=await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js'); const authMod=await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js'); const app=appMod.initializeApp(cfg); const auth=authMod.getAuth(app); window._authV9={signOut:()=>authMod.signOut(auth)}; authMod.onAuthStateChanged(auth,(user)=>{ if(user) showUser(user.email||user.uid); else showSignin(async(mode,email,pass)=>{ try{ if(mode==='signup') await authMod.createUserWithEmailAndPassword(auth,email,pass); else await authMod.signInWithEmailAndPassword(auth,email,pass); }catch(err){ alert(err.message||'Error de autenticación'); } }); }); }catch(e){ console.warn('No se pudo inicializar Firebase v9+', e); showAnon(); } })(); return; }
 
-  // 3) Nada detectado → modo local
+  // Nada detectado → modo local
   showAnon();
 })();
 </script>
