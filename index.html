@@ -153,7 +153,22 @@ const mealLabels={desayuno:"Desayuno", snack_am:"Snack mañana", comida:"Comida"
 // ===== Estado
 const KEY='nicomida_v33';
 let state=load();
-function load(){ try{ return JSON.parse(localStorage.getItem(KEY)) || {logs:{},plans:{}} }catch(_){ return {logs:{},plans:{}} }
+function load() {
+  try {
+    const raw = localStorage.getItem(KEY);
+    // Si hay basura en localStorage, intenta repararla borrando la clave
+    if (!raw) return { logs: {}, plans: {} };
+    const parsed = JSON.parse(raw);
+    if (parsed && typeof parsed === 'object' && 'logs' in parsed && 'plans' in parsed) return parsed;
+    // Si no es el formato esperado, reset
+    localStorage.removeItem(KEY);
+    return { logs: {}, plans: {} };
+  } catch (e) {
+    // Si el JSON está corrupto (Unexpected token , etc.), resetea
+    try { localStorage.removeItem(KEY); } catch(_) {}
+    return { logs: {}, plans: {} };
+  }
+}
 function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
 
 // ===== Léxico / categorías
@@ -263,15 +278,35 @@ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded'
   const bar = document.getElementById('login-bar');
   function showAnon(){ bar.innerHTML = '<span style="color:#64748b">Modo sin login</span>'; }
   function showUser(name){ bar.innerHTML = '👋 '+name+' · <button id="btn-out">Salir</button>'; document.getElementById('btn-out').onclick = ()=>{ if(window.firebase?.auth){ return window.firebase.auth().signOut(); } if(window._authV9){ return window._authV9.signOut(); } }; }
-  function showSignin(cb){ bar.innerHTML = '<button id="btn-in">Entrar con Google</button>'; document.getElementById('btn-in').onclick = cb; }
+  function showSignin(onSubmit){
+    bar.innerHTML = '<form id="login-form" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">'+
+      '<input id="auth-email" type="email" placeholder="email" style="padding:6px 8px;border:1px solid #e5e7eb;border-radius:999px">'+
+      '<input id="auth-pass" type="password" placeholder="contraseña" style="padding:6px 8px;border:1px solid #e5e7eb;border-radius:999px">'+
+      '<button type="submit">Entrar</button>'+
+      '<button type="button" id="btn-reg">Crear</button>'+
+    '</form>';
+    const f=document.getElementById('login-form');
+    const reg=document.getElementById('btn-reg');
+    f.onsubmit=(e)=>{ e.preventDefault(); const email=document.getElementById('auth-email').value.trim(); const pass=document.getElementById('auth-pass').value; onSubmit('signin', email, pass); };
+    reg.onclick=()=>{ const email=document.getElementById('auth-email').value.trim(); const pass=document.getElementById('auth-pass').value; onSubmit('signup', email, pass); };
+  }
 
   // 1) v8 ya cargado
   if(window.firebase && window.firebase.apps && window.firebase.apps.length){
     try{
       const auth = window.firebase.auth();
-      auth.onAuthStateChanged(function(user){ if(user) showUser(user.displayName||user.email); else showSignin(()=> auth.signInWithPopup(new window.firebase.auth.GoogleAuthProvider())); });
+      auth.onAuthStateChanged(function(user){
+        if(user) showUser(user.email || user.uid);
+        else showSignin(async (mode, email, pass)=>{
+          try{
+            if(mode==='signup') await auth.createUserWithEmailAndPassword(email, pass);
+            else await auth.signInWithEmailAndPassword(email, pass);
+          }catch(err){ alert(err.message||'Error de autenticación'); }
+        });
+      });
       return; // listo v8
     }catch(e){ console.warn('Auth v8 detectado pero falló:', e); }
+  }catch(e){ console.warn('Auth v8 detectado pero falló:', e); }
   }
 
   // 2) v9+ modular con config global/preexistente
@@ -284,7 +319,15 @@ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded'
         const app = appMod.initializeApp(cfg);
         const auth = authMod.getAuth(app);
         window._authV9 = {signOut: ()=>authMod.signOut(auth)};
-        authMod.onAuthStateChanged(auth, (user)=>{ if(user) showUser(user.displayName||user.email); else showSignin(()=> authMod.signInWithPopup(auth, new authMod.GoogleAuthProvider())); });
+        authMod.onAuthStateChanged(auth, (user)=>{
+          if(user) showUser(user.email || user.uid);
+          else showSignin(async (mode, email, pass)=>{
+            try{
+              if(mode==='signup') await authMod.createUserWithEmailAndPassword(auth, email, pass);
+              else await authMod.signInWithEmailAndPassword(auth, email, pass);
+            }catch(err){ alert(err.message||'Error de autenticación'); }
+          });
+        });
       }catch(e){ console.warn('No se pudo cargar Firebase modular:', e); showAnon(); }
     })();
     return;
